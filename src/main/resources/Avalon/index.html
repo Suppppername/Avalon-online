@@ -6,20 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avalon Online</title>
     <link rel="stylesheet" href="style.css">
-    <script>
-        function openCreateGamePopup() {
-            var popupWindow = window.open("", "Create Game", "width=600,height=400");
-            popupWindow.document.write(`
-                <h1>Create New Game</h1>
-                <form>
-                    <label for="gameName">Game Name:</label>
-                    <input type="text" id="gameName" name="gameName"><br><br>
-                    <label for="numPlayers">Number of Players:</label>
-                    <input type="number" id="numPlayers" name="numPlayers"><br><br>
-                    <input type="submit" value="Create Game">
-                </form>
-            `);
-        }
+    <script src=main.js>
+
     </script>
 </head>
 
@@ -37,8 +25,8 @@
     </header>
     <main>
         <section class="game-actions">
-            <button onclick="openCreateGamePopup()">New Games</button>
-            <button>Join Games</button>
+            <button id="newGameButton">New Games</button>
+            <button id="joinGameButton">Join Games</button>
         </section>
     </main>
     <footer>
