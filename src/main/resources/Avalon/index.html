@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avalon Online</title>
     <link rel="stylesheet" href="style.css">
-    <script src=main.js>
-
-    </script>
+    <script src=main.js></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 
 
@@ -23,10 +24,12 @@
             </ul>
         </nav>
     </header>
+
     <main>
         <section class="game-actions">
-            <button id="newGameButton">New Games</button>
-            <button id="joinGameButton">Join Games</button>
+            <input id="name" placeholder="Enter your name">
+            <button onclick="createGame()">New Games</button>
+            <button id="joinGame()">Join Games</button>
         </section>
     </main>
     <footer>

@@ -18,6 +18,6 @@ public class webSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry reg) {
-        reg.addEndpoint("/Avalon").withSockJS();
+        reg.addEndpoint("/gamePlay").withSockJS();
     }
 }

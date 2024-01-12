@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avalon Online</title>
+    <link rel="stylesheet" href="style.css">
+    <script src=main.js></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  </head>
+</head>
+<body>
+<h1>AVALON - ONLINE (developing)</h1>
+<header>
+  <nav>
+    <ul>
+      <li><a href="#characters">Characters</a></li>
+      <li><a href="#rules">Rules</a></li>
+      <li><a href="#settings">Settings</a></li>
+    </ul>
+  </nav>
+  <main>
+    <div id="circle">
+      <div class="room-info">
+        <p>Room ID : </p>
+        <p>Click below to copy</p>
+        <p>hejianzhong.org/Avalon/room/</p>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var circle = document.getElementById('circle');
+        // var seatCount = document.getElementById('seatCount').value;
+
+        // // Ensure seat count is within 5-10
+        // seatCount = Math.max(5, Math.min(seatCount, 10));
+        var seatCount = 5;
+
+        // Calculate the angle between seats
+        var angle = 360 / seatCount;
+
+        for (var i = 0; i < seatCount; i++) {
+          // Calculate seat position
+          var seatX = 150 + 250 * Math.cos((angle * i) * (Math.PI / 180));
+          var seatY = 150 + 250 * Math.sin((angle * i) * (Math.PI / 180));
+
+          var seat = document.createElement('div');
+          seat.classList.add('seat');
+          seat.style.left = `${seatX}px`;
+          seat.style.top = `${seatY}px`;
+          seat.innerText = `Player #${i + 1}`;
+          circle.appendChild(seat);
+        }
+      });
+    </script>
+
+  </main>
+  <footer>
+    <p>Credit: Jianzhong He</p>
+    <p>Email: hejianzhong@berkeley.edu</p>
+  </footer>
+</header>
+</body>
+</html>
