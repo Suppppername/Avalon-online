@@ -23,39 +23,31 @@
     </ul>
   </nav>
   <main>
+    <div class="game-layout">
+      <div class="seats">
+        <div class="box">Player #1</div>
+        <div class="box">Player #2</div>
+        <div class="box">Player #3</div>
+        <div class="box">Player #4</div>
+      </div>
     <div id="circle">
       <div class="room-info">
-        <p>Room ID : </p>
+        <p>Room ID : 1 </p>
         <p>Click below to copy</p>
-        <p>hejianzhong.org/Avalon/room/</p>
+        <p style="color: #0000EE" id="link-to-copy" onclick="copyLink()"><u>hejianzhong.org/Avalon/room1</u></p>
       </div>
     </div>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var circle = document.getElementById('circle');
-        // var seatCount = document.getElementById('seatCount').value;
+      <div class="seats">
 
-        // // Ensure seat count is within 5-10
-        // seatCount = Math.max(5, Math.min(seatCount, 10));
-        var seatCount = 5;
+        <div class="box">Player #6</div>
+        <div class="box">Player #7</div>
+        <div class="box">Player #8</div>
 
-        // Calculate the angle between seats
-        var angle = 360 / seatCount;
+      </div>
+    </div>
 
-        for (var i = 0; i < seatCount; i++) {
-          // Calculate seat position
-          var seatX = 150 + 250 * Math.cos((angle * i) * (Math.PI / 180));
-          var seatY = 150 + 250 * Math.sin((angle * i) * (Math.PI / 180));
 
-          var seat = document.createElement('div');
-          seat.classList.add('seat');
-          seat.style.left = `${seatX}px`;
-          seat.style.top = `${seatY}px`;
-          seat.innerText = `Player #${i + 1}`;
-          circle.appendChild(seat);
-        }
-      });
-    </script>
+
 
   </main>
   <footer>
