@@ -7,7 +7,7 @@ function createGame() {
         return;
     }
 
-    var numPlayer = parseInt(prompt("How many players?", "enter between 5 - 10"), 10);
+    var numPlayer = parseInt(prompt("How many players?", "Enter between 5 - 10"), 10);
     if (isNaN(numPlayer)) {
         alert("That's not a number!");
     }
