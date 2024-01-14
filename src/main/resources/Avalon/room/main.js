@@ -16,11 +16,33 @@ function copyLink() {
   try {
     var successful = document.execCommand('copy');
     var msg = successful ? 'successful' : 'unsuccessful';
-    console.log('Copying text command was ' + msg);
   } catch (err) {
-    console.log('Unable to copy', err);
   }
-
   document.body.removeChild(textarea);
+}
 
+function openSettings() {
+  document.getElementById('settingsModal').style.display = "block";
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = "none";
+}
+
+window.onclick = function(event) {
+  var settingsModal = document.getElementById('settingsModal');
+  var rulesModal = document.getElementById('rulesModal');
+  if (event.target == settingsModal) {
+    settingsModal.style.display = "none";
+  }else if (event.target == rulesModal) {
+    rulesModal.style.display = "none";
+  }
+}
+
+function openRules() {
+  document.getElementById('rulesModal').style.display = "block";
+}
+
+function closeRules() {
+  document.getElementById('rulesModal').style.display = "none";
 }

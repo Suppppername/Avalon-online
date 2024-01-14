@@ -22,3 +22,29 @@ function createGame() {
 
 
 }
+
+function openSettings() {
+    document.getElementById('settingsModal').style.display = "block";
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').style.display = "none";
+}
+
+window.onclick = function(event) {
+    var settingsModal = document.getElementById('settingsModal');
+    var rulesModal = document.getElementById('rulesModal');
+    if (event.target == settingsModal) {
+        settingsModal.style.display = "none";
+    }else if (event.target == rulesModal) {
+        rulesModal.style.display = "none";
+    }
+}
+
+function openRules() {
+    document.getElementById('rulesModal').style.display = "block";
+}
+
+function closeRules() {
+    document.getElementById('rulesModal').style.display = "none";
+}
