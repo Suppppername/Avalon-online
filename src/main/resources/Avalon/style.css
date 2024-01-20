@@ -111,3 +111,13 @@ footer {
     text-decoration: none;
     cursor: pointer;
 }
+
+.half {
+    flex: 1;
+}
+.green {
+    background-color: #c8ffc8;
+}
+.red {
+    background-color: #ffa9a9;
+}

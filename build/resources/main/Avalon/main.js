@@ -1,8 +1,61 @@
-document.addEventListener('DOMContentLoaded', function () {
-    var newGameButton = document.getElementById('newGameButton');
+const url = 'http://hejianzhong.org/avalon'
 
-    newGameButton.addEventListener('click', function () {
-        var username = prompt("Please enter your username", "Username");
-        console.log(username);
-    });
-});
+function createGame() {
+    let name = document.getElementById("name").value;
+    if (name == null || name === "" || name.length > 10) {
+        alert("Please enter a valid name");
+        return;
+    }
+
+    var numPlayer = parseInt(prompt("How many players?", "Enter between 5 - 10"), 10);
+    if (isNaN(numPlayer)) {
+        alert("That's not a number!");
+    }
+    if (numPlayer < 5 || numPlayer > 10) {
+        alert(numPlayer + " players not supported");
+    }
+
+    // jump to next html file
+    // prob hejianzhong.org/avalon/room/create
+    window.location.href='room/index.html'
+
+
+
+}
+
+function openSettings() {
+    document.getElementById('settingsModal').style.display = "block";
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').style.display = "none";
+}
+
+window.onclick = function(event) {
+    var settingsModal = document.getElementById('settingsModal');
+    var rulesModal = document.getElementById('rulesModal');
+    var charactersModal = document.getElementById('charactersModal');
+    if (event.target == settingsModal) {
+        settingsModal.style.display = "none";
+    }else if (event.target == rulesModal) {
+        rulesModal.style.display = "none";
+    }else if (event.target == charactersModal) {
+        charactersModal.style.display = "none";
+    }
+}
+
+function openRules() {
+    document.getElementById('rulesModal').style.display = "block";
+}
+
+function closeRules() {
+    document.getElementById('rulesModal').style.display = "none";
+}
+
+function openCharacters() {
+    document.getElementById('charactersModal').style.display = "block";
+}
+
+function closeCharacters() {
+    document.getElementById('charactersModal').style.display = "none";
+}

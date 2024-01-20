@@ -17,7 +17,7 @@ function createGame() {
 
     // jump to next html file
     // prob hejianzhong.org/avalon/room/create
-
+    window.location.href='room/index.html'
 
 
 
@@ -34,10 +34,13 @@ function closeSettings() {
 window.onclick = function(event) {
     var settingsModal = document.getElementById('settingsModal');
     var rulesModal = document.getElementById('rulesModal');
+    var charactersModal = document.getElementById('charactersModal');
     if (event.target == settingsModal) {
         settingsModal.style.display = "none";
     }else if (event.target == rulesModal) {
         rulesModal.style.display = "none";
+    }else if (event.target == charactersModal) {
+        charactersModal.style.display = "none";
     }
 }
 
@@ -47,4 +50,12 @@ function openRules() {
 
 function closeRules() {
     document.getElementById('rulesModal').style.display = "none";
+}
+
+function openCharacters() {
+    document.getElementById('charactersModal').style.display = "block";
+}
+
+function closeCharacters() {
+    document.getElementById('charactersModal').style.display = "none";
 }

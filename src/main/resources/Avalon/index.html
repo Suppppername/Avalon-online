@@ -15,6 +15,34 @@
 
 <body>
 
+
+<div id="charactersModal" class="modal-background">
+    <div class="rulesModal-content" style="height: 23%">
+        <span class="close-button" onclick="closeCharacters()">&times;</span>
+        <div style="display: flex">
+            <div class="green half">
+                <div style="font-weight: bold;font-size: 20px"  >Good</div>
+                <ul style="text-align: left; font-size: 20px" >
+                    <li>Merlin: Knows evil, must remain hidden</li>
+                    <li>Percival: Knows Merlin</li>
+                    <li>Loyal servant of Arthur: Normie</li>
+
+                </ul>
+            </div>
+            <div class="red half">
+                <div style="font-weight: bold;font-size: 20px"  >Evil</div>
+                <ul style="text-align: left; font-size: 20px" >
+                    <li>Mordred: Unknown to Merlin</li>
+                    <li>Morgana: Appears as Merlin</li>
+                    <li>Assassin: In case of lost, assassinate Merlin</li>
+                    <li>Oberon: Unknown to Evil</li>
+                    <li>Minions of Mordred: Normie</li>
+                </ul>
+            </div>
+        </div>
+</div>
+</div>
+
 <div id="rulesModal" class="modal-background">
     <div class="rulesModal-content">
         <span class="close-button" onclick="closeRules()">&times;</span>
@@ -94,7 +122,7 @@
         <h1>AVALON - ONLINE (developing)</h1>
         <nav>
             <ul>
-                <li><button >Characters</button></li>
+                <li><button onclick="openCharacters()">Characters</button></li>
                 <li><button onclick="openRules()" >Rules</button></li>
             </ul>
         </nav>
