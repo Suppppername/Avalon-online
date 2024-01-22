@@ -1,5 +1,6 @@
 package com.hejianzhong.Personal.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,8 @@ public class Game {
     private int playerTurn;
 
     public Game() {
-        playerTurn=1;
+        this.playerTurn=1;
+        this.players = new ArrayList<>();
+
     }
 }
