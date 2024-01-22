@@ -57,3 +57,5 @@ function openCharacters() {
 function closeCharacters() {
   document.getElementById('charactersModal').style.display = "none";
 }
+
+

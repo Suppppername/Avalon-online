@@ -101,6 +101,21 @@ footer {
   margin: 0 30px;
 
 }
+.ribbon {
+  position: relative;
+  left: 120px;
+  top: -30px;
+  font-size: 20px;
+  color: red;
+}
+
+.ribbon-left{
+  position: relative;
+  left: -50px;
+  top: -30px;
+  font-size: 20px;
+  color: red;
+}
 
 
 .flex-center {
