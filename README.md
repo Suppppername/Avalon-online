@@ -1,4 +1,4 @@
 # Avalon-online
-An online version of the board game Avalon hejianzhong.org/Avalon
+An online version of the board game Avalon 
 
-Play it 
+Play now! [hejianzhong.org/Avalon](https://hejianzhong.org)
