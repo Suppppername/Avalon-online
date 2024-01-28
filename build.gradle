@@ -14,6 +14,7 @@ java {
 
 repositories {
 	mavenCentral()
+
 }
 
 dependencies {
@@ -24,8 +25,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	testCompileOnly 'org.projectlombok:lombok:1.18.30'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
-	implementation 'org.springframework.data:spring-data-mongodb:1.7.2.RELEASE'
-	
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 }
 
 tasks.named('test') {

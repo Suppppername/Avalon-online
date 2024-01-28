@@ -28,10 +28,13 @@ function createGame() {
         dataType: "JSON",
         contentType: "application/json",
         data: JSON.stringify({
-            "name": name
+            "name": name,
+            "numPlayer": numPlayer
+
         }),
         success: function (data) {
             gameID = data.id;
+
             playerType = ""; // characters
             //refresh
             connectToSocket(gameID);
@@ -86,7 +89,7 @@ function connectToRoom() {
 
 function connectToSocket(gameID) {
     console.log("connecting to the game");
-    let socket = new socketJS(url+"/sow");
+    let socket = new socketJS(url+"/gamePlay");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log("connecting to frame: " + frame);
