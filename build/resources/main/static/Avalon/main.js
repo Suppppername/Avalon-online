@@ -12,15 +12,7 @@ function createGame() {
         return;
     }
 
-    var numPlayer = parseInt(prompt("How many players?", "Enter between 5 - 10"), 10);
-    if (isNaN(numPlayer)) {
-        alert("That's not a number!");
-        return;
-    }
-    if (numPlayer < 5 || numPlayer > 10) {
-        alert(numPlayer + " players not supported");
-        return;
-    }
+
 
     $.ajax({
         url: url + "/game/create",
@@ -28,9 +20,7 @@ function createGame() {
         dataType: "JSON",
         contentType: "application/json",
         data: JSON.stringify({
-            "name": name,
-            "numPlayer": numPlayer
-
+            "name": name
         }),
         success: function (data) {
             gameID = data.id;

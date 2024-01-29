@@ -1,18 +1,13 @@
 package com.hejianzhong.Personal.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hejianzhong.Personal.repository.gameRepo;
 import com.hejianzhong.Personal.model.*;
 import com.hejianzhong.Personal.exception.*;
-import java.security.PublicKey;
+
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +17,33 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class gameService {
 
-    public Game createGame(Player player, int numPlayer) {
+    public final int MAX_PLAYERS = 10;
+
+    public Game createGame(Player player) {
         Game game = new Game();
-        game.setID(UUID.randomUUID().toString().substring(0, 5).toLowerCase());
-        game.setNumPlayers(numPlayer);
+        game.setID(UUID.randomUUID().toString().substring(0, 5).toUpperCase());
         game.setStatus(gameStatusEnum.NEW);
+        game.setNumPlayers(1);
+        ArrayList<Player> players = game.getPlayers();
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            if (players.get(i) == null) {
+                players.set(i, player);
+                break;
+            }
+            if (players.get(i).getName().equals(player.getName())) {
+                throw new gameException("Player name already exists");
+            }
+            if (i == players.size() - 1) {
+                throw new gameException("Game is full");
+            }
+        }
+
         gameRepo.getInstance().addGame(game);
         return game;
     }
 
-    public Game connectToGame(Player player, String gameID) {
-        gameID = gameID.toLowerCase();
+    public Game joinGame(Player player, String gameID) {
+        gameID = gameID.toUpperCase();
         if (!gameRepo.getInstance().getGames().containsKey(gameID)) {
             throw new gameException("Game not found");
         }
@@ -40,11 +51,38 @@ public class gameService {
         if (game.getStatus() != gameStatusEnum.NEW) {
             throw new gameException("Game is already started");
         }
-        if (game.getPlayers().size() >= game.getNumPlayers()) {
-            throw new gameException("Game is full");
+        ArrayList<Player> players = game.getPlayers();
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            if (players.get(i) == null) {
+                players.set(i, player);
+                break;
+            }
+            if (players.get(i).getName().equals(player.getName())) {
+                throw new gameException("Player name already exists");
+            }
+            if (i == players.size() - 1) {
+                throw new gameException("Game is full");
+            }
         }
-        game.getPlayers().add(player);
+        game.setNumPlayers(game.getNumPlayers() + 1);
+        gameRepo.getInstance().addGame(game);
         return game;
+    }
+
+    public Game collectVote(vote vote, String gameID) {
+        gameID = gameID.toUpperCase();
+        if (!gameRepo.getInstance().getGames().containsKey(gameID)) {
+            throw new gameException("Game not found");
+        }
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        if (game.getStatus() != gameStatusEnum.IN_PROGRESS) {
+            throw new gameException("Game is not in progress");
+        }
+        return game;
+
+
+
+
     }
 
 

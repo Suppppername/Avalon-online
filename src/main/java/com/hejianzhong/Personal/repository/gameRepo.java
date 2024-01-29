@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 @ComponentScan
 public class gameRepo {
-
     private static Map<String, Game> games;
     private static gameRepo instance;
 

@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class gamePlay {
-    private String id;
+public class vote {
+    private String gameId;
+    private String playerName;
+    private boolean vote;
 }

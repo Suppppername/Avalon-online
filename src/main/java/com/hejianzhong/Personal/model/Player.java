@@ -8,6 +8,5 @@ public class Player {
     private String name;
     private charactersEnum character;
     private sideEnum side;
-    private int seat;
 
 }
