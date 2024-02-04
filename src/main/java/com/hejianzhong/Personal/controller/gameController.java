@@ -24,19 +24,23 @@ public class gameController {
     private final gameService service;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    @PostMapping("/create")
+    @PostMapping("/Avalon/create")
     public ResponseEntity<Game> create(@RequestBody Player player) {
         log.info("Create game request : {}", player);
         return ResponseEntity.ok(service.createGame(player));
     }
 
-    @PostMapping("/{gameID}")
+    @PostMapping("/Avalon/join/{gameID}")
     public ResponseEntity<Game> join(@RequestBody Player player, @PathVariable(value = "gameID") String gameID) {
         log.info("Connect to game request : {}" + "/n gameID : " + gameID, player);
         return ResponseEntity.ok(service.joinGame(player, gameID));
     }
 
-    @PostMapping("/{gameID}/collectVote")
+
+
+
+
+    @PostMapping("/Avalon/{gameID}/collectVote")
     public ResponseEntity<Game> collectVote(@RequestBody vote vote, @PathVariable(value = "gameID") String gameID) {
         log.info("vote : {}", vote);
         return ResponseEntity.ok(service.collectVote(vote, gameID));

@@ -116,8 +116,98 @@ footer {
     flex: 1;
 }
 .green {
-    background-color: #c8ffc8;
+    background-color: #fff;
 }
 .red {
-    background-color: #ffa9a9;
+    background-color: #fff;
+}
+
+#circle {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin: 0 auto;
+    margin-top: 0px;
+}
+
+
+
+.circle-info {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.seat {
+    width: 200px;
+    height: 90px;
+    border: 1px solid #000;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    text-align: center;
+    margin: 0 30px;
+
+}
+.ribbon {
+    position: relative;
+    left: 120px;
+    top: -30px;
+    font-size: 20px;
+    color: red;
+}
+
+
+.ribbon-left{
+    position: relative;
+    left: -50px;
+    top: -30px;
+    font-size: 20px;
+    color: red;
+}
+
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 65vh;
+}
+.flex-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; /* Distribute boxes vertically */
+    height: 500px; /* Match height of central circle */
+}
+
+#hiddenParagraph {
+    display: none;
+}
+
+.start-game-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.start-game-button:hover
+.start-game-button:focus{
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

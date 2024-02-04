@@ -22,12 +22,13 @@ public class Game {
     private ArrayList<Boolean> rounds;
     private ArrayList<Boolean> tasks;
     private ArrayList<Boolean> vote;
-    private HashMap<Integer, List> setUpMap = new HashMap<Integer, List>();
+//    private HashMap<Integer, List> setUpMap = new HashMap<Integer, List>();
+    private int[] setUp;
     private boolean isVote;
 
     public Game() {
         this.playerTurn=0;
-        this.numPlayers = -1;// for debug only
+        this.numPlayers = 0;
         this.players = new ArrayList<Player>(10);
         for (int i = 0; i < 10; i++) {
             players.add(null);
@@ -40,15 +41,12 @@ public class Game {
             tasks.add(null);
         }
         this.isVote = false;
-        setUpMap.put(5, Arrays.asList(3,2));
-        setUpMap.put(6, Arrays.asList(4,2));
-        setUpMap.put(7, Arrays.asList(4,3));
-        setUpMap.put(8, Arrays.asList(5,3));
-        setUpMap.put(9, Arrays.asList(6,3));
-        setUpMap.put(10, Arrays.asList(6,4));
-
-
-
-
+        this.setUp = new int[2];
+//        setUpMap.put(5, Arrays.asList(3,2));
+//        setUpMap.put(6, Arrays.asList(4,2));
+//        setUpMap.put(7, Arrays.asList(4,3));
+//        setUpMap.put(8, Arrays.asList(5,3));
+//        setUpMap.put(9, Arrays.asList(6,3));
+//        setUpMap.put(10, Arrays.asList(6,4));
     }
 }
