@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,19 +26,18 @@ public class gameController {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping("/Avalon/create")
-    public ResponseEntity<Game> create(@RequestBody Player player) {
-        log.info("Create game request : {}", player);
-        return ResponseEntity.ok(service.createGame(player));
+    public ResponseEntity<Game> create() {
+        log.info("Create game request");
+        return ResponseEntity.ok(service.createGame());
     }
 
     @PostMapping("/Avalon/join/{gameID}")
     public ResponseEntity<Game> join(@RequestBody Player player, @PathVariable(value = "gameID") String gameID) {
         log.info("Connect to game request : {}" + "/n gameID : " + gameID, player);
-        return ResponseEntity.ok(service.joinGame(player, gameID));
+        Game game = service.joinGame(player, gameID);
+        simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        return ResponseEntity.ok(game);
     }
-
-
-
 
 
     @PostMapping("/Avalon/{gameID}/collectVote")
@@ -45,6 +45,26 @@ public class gameController {
         log.info("vote : {}", vote);
         return ResponseEntity.ok(service.collectVote(vote, gameID));
     }
+
+    @GetMapping("/Avalon/{gameID}") // look up game state from the server
+    public ResponseEntity<Game> getGame(@PathVariable(value = "gameID") String gameID) {
+        log.info("Get game request : {}", gameID);
+        return ResponseEntity.ok(service.getGame(gameID));
+    }
+
+    @PostMapping("/Avalon/{gameID}/start")
+    public ResponseEntity<Game> startGame(@RequestBody setting setting,@PathVariable(value = "gameID") String gameID) {
+        log.info("Start game request : {}", gameID);
+        Game game = service.startGame(gameID, setting);
+        simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        return ResponseEntity.ok(game);
+    }
+
+
+
+
+
+
 
 
 

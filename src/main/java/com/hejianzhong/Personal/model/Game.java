@@ -18,6 +18,7 @@ public class Game {
     private gameStatusEnum status;
     private int numPlayers;
     private ArrayList<Player> players; // 1 - 10
+    private Player owner;
     private int playerTurn;// 0 - 9
     private ArrayList<Boolean> rounds;
     private ArrayList<Boolean> tasks;
@@ -36,6 +37,7 @@ public class Game {
         this.rounds = new ArrayList<Boolean>(5);
         this.tasks = new ArrayList<Boolean>(5);
         this.vote = new ArrayList<Boolean>(10);
+        this.owner = null;
         for (int i = 0; i < 5; i++) {
             rounds.add(null);
             tasks.add(null);

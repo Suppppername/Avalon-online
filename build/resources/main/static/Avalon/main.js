@@ -1,51 +1,38 @@
 const url = 'http://localhost:8080';
 let stompClient;
 let gameID;
+let name;
+
+// Session storage:
+// firstTime: 1 if it's the first time the user enters the game, 0 otherwise
+// name: the name of the player
+// gameID: the id of the game
 
 function connectToSocket(gameID) {
   console.log("connecting to the game");
-  let socket = new SockJS(url + "/vote");
+  let socket = new SockJS(url+"/avalon");
   stompClient = Stomp.over(socket);
   stompClient.connect({}, function (frame) {
     console.log("connecting to frame: " + frame);
-    stompClient.subscribe("/topic/gameProgress/" + gameID,
+    stompClient.subscribe("/topic/game/" + gameID,
         function (response) {
           let data = JSON.parse(response.body);
-          console.log(data);
-
+          console.log(data); // for debugging, not visible for users for fairness reasons
+          displayPlayers(data);
         });
   });
 }
 
 function createGame() {
-  let name = document.getElementById("name").value;
-  let prepPage = document.getElementById("prepPage");
-  let roomPage = document.getElementById("roomPage");
-
-  if (name == null || name === "" || name.length > 10) {
-    alert("Please enter a valid name");
-    return;
-  }
   $.ajax({
         url: url + "/game/Avalon/create",
         type: 'POST',
         dataType: "JSON",
         contentType: "application/json",
-        data: JSON.stringify({
-          "name": name
-        }),
         success: function (data) {
-            console.log(data);
           gameID = data.id;
-          connectToSocket(gameID);
-          prepPage.style.display = "none";
-          roomPage.style.display = "block";
-          let roomID = document.getElementById("roomID");
-          roomID.textContent = "Room ID: " + gameID;
-          let player1 = document.getElementById("player1");
-          player1.textContent = name;
-          player1.style.fontSize = "20px";
-          history.pushState({}, null, url + "/Avalon/" + gameID);
+          sessionStorage.setItem("firstTime", "1");
+          window.location.href = url + "/Avalon/" + data.id;
         },
         error: function (error) {
           console.log(error);
@@ -55,7 +42,62 @@ function createGame() {
   )
 }
 
-
+function enter() {
+  var path = window.location.pathname.split('/');
+  gameID = path[path.length - 1];
+  let roomID = document.getElementById("roomID");
+  roomID.textContent = "Room ID: " + gameID;
+  let linkToCopy = document.getElementById("link-to-copy");
+  linkToCopy.textContent = window.location.href;
+  linkToCopy.style.textDecoration = "underline";
+  if (sessionStorage.getItem("firstTime") == "1" || sessionStorage.getItem("firstTime") == null){
+    name = window.prompt("Please enter your name");
+    while (name == null || name === "" || name.length > 10) {
+      name = window.prompt("Please enter a valid name");
+    }
+    $.ajax({
+      url: url + "/game/Avalon/join/" + gameID,
+      type: 'POST',
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({
+        "name": name
+      }),
+      success: function (data) {
+        console.log(data);
+        gameID = data.id;
+        sessionStorage.setItem("firstTime", "0");
+        sessionStorage.setItem("name", name);
+        sessionStorage.setItem("gameID", gameID);
+        console.log(data);
+        gameID = data.id;
+        connectToSocket(gameID);
+        displayPlayers(data);
+      },
+      error: function (error) {
+        console.log(error);
+        alert("error joining the game, please close browser and try again, possibly name issues");
+      },
+    });
+  } else {
+    $.ajax({
+      url: url + "/game/Avalon/" + gameID,
+      type: 'GET',
+      dataType: "json",
+      contentType: "application/json",
+      success: function (data) {
+        console.log(data);
+        gameID = data.id;
+        connectToSocket(gameID);
+        displayPlayers(data);
+      },
+      error: function (error) {
+        console.log(error);
+        alert("please refresh");
+      },
+    });
+    }
+}
 
 function joinGame() {
   let name = document.getElementById("name").value;
@@ -83,18 +125,11 @@ function joinGame() {
       roomPage.style.display = "block";
       let roomID = document.getElementById("roomID");
       roomID.textContent = "Room ID: " + gameID;
-      for (let i = 0; i < 10; i++) {
-        if (game.players[i] != null) {
-          let player = document.getElementById("player" + (i + 1));
-          player.textContent = game.players[i].name;
-          player.style.fontSize = "20px";
-        }
-      }
+      displayPlayers(game);
     },
     error: function (error) {
       console.log(error);
       alert("the roomID " + roomID + " does not exist or room is full");
-
     },
   })
 
@@ -102,6 +137,43 @@ function joinGame() {
 
 function openSettings() {
   document.getElementById('settingsModal').style.display = "block";
+
+  $.ajax({
+    url: url + "/game/Avalon/" + gameID,
+    type: 'GET',
+    dataType: "json",
+    contentType: "application/json",
+    success: function (data) {
+      var players = data.players;
+      var count = 0;
+      for (let i = 0; i < 10; i++) {
+        if (players[i] != null) {
+          count++;
+        }
+      }
+      document.getElementById("currentPlayers").textContent = count.toString();
+      if (count <= 5) {
+        document.getElementById("goodSide").textContent = 3;
+        document.getElementById("badSide").textContent = 2;
+      } else if (count = 6) {
+        document.getElementById("goodSide").textContent = 4;
+        document.getElementById("badSide").textContent = 2;
+      } else if (count = 7) {
+        document.getElementById("goodSide").textContent = 4;
+        document.getElementById("badSide").textContent = 3;
+      } else if (count = 8) {
+        document.getElementById("goodSide").textContent = 5;
+        document.getElementById("badSide").textContent = 3;
+      } else if (count = 9) {
+        document.getElementById("goodSide").textContent = 6;
+        document.getElementById("badSide").textContent = 3;
+      } else if (count = 10) {
+        document.getElementById("goodSide").textContent = 6;
+        document.getElementById("badSide").textContent = 4;
+      }
+    }
+  });
+
 }
 
 function closeSettings() {
@@ -137,9 +209,7 @@ function closeCharacters() {
   document.getElementById('charactersModal').style.display = "none";
 }
 
-function openSettings() {
 
-}
 
 function copyLink() {
   var paragraph = document.getElementById("hiddenParagraph");
@@ -163,3 +233,55 @@ function copyLink() {
   document.body.removeChild(textarea);
 }
 
+function displayPlayers(game) {
+  for (let i = 0; i < 10; i++) {
+    if (game.players[i] != null) {
+      let player = document.getElementById("player" + (i + 1));
+      if (game.owner.name === game.players[i].name) {
+        player.textContent = game.players[i].name + " (Owner)";
+      }else{
+        player.textContent = game.players[i].name;
+      }
+      player.style.fontSize = "20px";
+    }
+  }
+}
+
+function confirm(){
+  $.ajax({
+    url: url + "/game/Avalon/" + gameID,
+    type: 'GET',
+    dataType: "json",
+    contentType: "application/json",
+    success: function (data) {
+      if (name != data.owner.name) {
+        alert("Only the owner (" + data.owner.name +") can confirm the setting the game");
+        return;
+      }
+      var players = data.players;
+      var count = 0;
+      for (let i = 0; i < 10; i++) {
+        if (players[i] != null) {
+          count++;
+        }
+      }
+
+      if (count < 5) {
+        alert("You need at least 5 players to start the game");
+      }
+      if (document.getElementById('mordred') + document.getElementById(
+              'morgana') + document.getElementById('percival')
+          + document.getElementById('minions') + document.getElementById(
+              'servant') + 2 < 5) {
+        alert("Incorrect setting! Please adjust the number for each character");
+      }
+
+
+    },
+    error: function (error) {
+      console.log(error);
+      alert("Please close setting and try again.");
+    }
+  })
+
+}

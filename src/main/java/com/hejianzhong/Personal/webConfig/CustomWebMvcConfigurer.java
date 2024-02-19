@@ -13,10 +13,12 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         registry.addViewController("/Avalon/").setViewName("forward:/Avalon/index.html");
         registry.addViewController("/avalon").setViewName("redirect:/Avalon/");
         registry.addViewController("/avalon/").setViewName("forward:/Avalon/index.html");
-        registry.addViewController("/avalon/?").setViewName("redirect:/Avalon/");
-        registry.addViewController("/Avalon/?").setViewName("redirect:/Avalon/");
-        registry.addViewController("/Avalon/?").setViewName("forward:/Avalon/entry.html");
-        registry.addViewController("/avalon/?").setViewName("forward:/Avalon/entry.html");
+        registry.addViewController("/avalon/?????").setViewName("redirect:/Avalon/");
+        registry.addViewController("/Avalon/?????").setViewName("redirect:/Avalon/");
+        registry.addViewController("/Avalon/?????").setViewName("forward:/Avalon/entry.html");
+        registry.addViewController("/avalon/?????").setViewName("forward:/Avalon/entry.html");
+
+
 
 
 
