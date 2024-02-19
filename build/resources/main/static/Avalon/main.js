@@ -2,6 +2,8 @@ const url = 'http://localhost:8080';
 let stompClient;
 let gameID;
 let name;
+let gameConfirmed = false;
+let characterNotified = false;
 
 // Session storage:
 // firstTime: 1 if it's the first time the user enters the game, 0 otherwise
@@ -17,10 +19,75 @@ function connectToSocket(gameID) {
     stompClient.subscribe("/topic/game/" + gameID,
         function (response) {
           let data = JSON.parse(response.body);
-          console.log(data); // for debugging, not visible for users for fairness reasons
-          displayPlayers(data);
+          if (data.status === "NEW") {
+            console.log(data); // for debugging, not visible for users for fairness reasons
+            displayPlayers(data);
+          }else if (data.status === "IN_PROGRESS") {
+            gameSetup(data);
+          }
         });
   });
+}
+
+function gameSetup(data) {
+  console.log(data);
+  displayPlayersExceptNull(data);
+  document.getElementById('pregameInfo').style.display = "none";
+  document.getElementById('gameInfo').style.display = "block";
+  var character = data.players.find(
+      player => player != null && player.name === name).character;
+  document.getElementById('character').textContent= "Your character is: " + character;
+  if (character === "MERLIN") {
+    document.getElementById('character').style.color = "#009933"
+    var validPlayers = data.players.filter((player) => player != null);
+    var evilPlayers = validPlayers.filter((player) => player.character === "MORGANA" ||  player.character === "ASSASSIN" || player.character === "MINION");
+    var evilPlayersNames = evilPlayers.map(player => player.name);
+    for (let i = 1; i < 11; i++) {
+      for (let j = 0; j < evilPlayersNames.length; j++) {
+        if (document.getElementById("player" + i).textContent === evilPlayersNames[j] || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === evilPlayersNames[j])) {
+          document.getElementById("player" + i).style.color = "#ff6666";
+        }else if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
+          document.getElementById("player" + i).style.color = "#009933";
+        }
+      }
+    }
+    alert("Your character is " + character + ". The evil players are: " + evilPlayersNames);
+  }else if (character === "PERCIVAL") {
+    document.getElementById('character').style.color = "#009933"
+    var validPlayers = data.players.filter((player) => player != null);
+    var morgana = validPlayers.find(player => player.character === "MORGANA");
+    var merlin = validPlayers.find(player => player.character === "MERLIN");
+    for (let i = 1; i < 11; i++) {
+         if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
+          document.getElementById("player" + i).style.color = "#009933";
+        }
+    }
+    alert("Your character is Percival. The two characters are: " + morgana.name + " and " + merlin.name);
+  }else if (character === "MORGANA" || character === "ASSASSIN" || character === "MINION" || character === "MORDRED") {
+    document.getElementById('character').style.color = "#ff6666";
+    var validPlayers = data.players.filter((player) => player != null);
+    var evilPlayers = validPlayers.filter((player) =>
+        player.character === "MORGANA" || player.character
+        === "ASSASSIN" || player.character === "MINION"
+        || player.character === "MORDRED");
+    var evilPlayersNames = evilPlayers.map(player => player.name);
+    for (let i = 1; i < 11; i++) {
+      for (let j = 0; j < evilPlayersNames.length; j++) {
+        if (document.getElementById("player" + i).textContent === evilPlayersNames[j] || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === evilPlayersNames[j])) {
+          document.getElementById("player" + i).style.color = "#ff6666";
+        }
+      }
+    }
+    alert("Your character is " + character + ". The evil players are: " + evilPlayersNames);
+  }else if (character === "SERVANT") {
+    document.getElementById('character').style.color = "#009933";
+    for (let i = 1; i < 11; i++) {
+      if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
+          document.getElementById("player" + i).style.color = "#009933";
+        }
+    }
+    alert("Your character is " + character + ". You are a good guy.");
+  }
 }
 
 function createGame() {
@@ -155,19 +222,19 @@ function openSettings() {
       if (count <= 5) {
         document.getElementById("goodSide").textContent = 3;
         document.getElementById("badSide").textContent = 2;
-      } else if (count = 6) {
+      } else if (count === 6) {
         document.getElementById("goodSide").textContent = 4;
         document.getElementById("badSide").textContent = 2;
-      } else if (count = 7) {
+      } else if (count === 7) {
         document.getElementById("goodSide").textContent = 4;
         document.getElementById("badSide").textContent = 3;
-      } else if (count = 8) {
+      } else if (count === 8) {
         document.getElementById("goodSide").textContent = 5;
         document.getElementById("badSide").textContent = 3;
-      } else if (count = 9) {
+      } else if (count === 9) {
         document.getElementById("goodSide").textContent = 6;
         document.getElementById("badSide").textContent = 3;
-      } else if (count = 10) {
+      } else if (count === 10) {
         document.getElementById("goodSide").textContent = 6;
         document.getElementById("badSide").textContent = 4;
       }
@@ -238,7 +305,7 @@ function displayPlayers(game) {
     if (game.players[i] != null) {
       let player = document.getElementById("player" + (i + 1));
       if (game.owner.name === game.players[i].name) {
-        player.textContent = game.players[i].name + " (Owner)";
+        player.textContent = game.players[i].name + "(owner)";
       }else{
         player.textContent = game.players[i].name;
       }
@@ -265,18 +332,20 @@ function confirm(){
           count++;
         }
       }
-
       if (count < 5) {
         alert("You need at least 5 players to start the game");
+        return;
       }
       if (document.getElementById('mordred') + document.getElementById(
               'morgana') + document.getElementById('percival')
           + document.getElementById('minions') + document.getElementById(
               'servant') + 2 < 5) {
         alert("Incorrect setting! Please adjust the number for each character");
+        return;
       }
-
-
+      gameConfirmed = true;
+      closeSettings();
+      alert("Game is ready to start");
     },
     error: function (error) {
       console.log(error);
@@ -284,4 +353,52 @@ function confirm(){
     }
   })
 
+}
+
+function startGame() {
+  if (!gameConfirmed) {
+    alert("Please confirm the game setting first");
+    return;
+  }
+  $.ajax({
+    url:url+"/game/Avalon/"+gameID+"/start",
+    type: 'POST',
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify({
+      "mordred": document.getElementById('mordred').value,
+      "morgana": document.getElementById('morgana').value,
+      "percival": document.getElementById('percival').value,
+      "minions": document.getElementById('minions').value,
+      "servant": document.getElementById('servant').value,
+    }),
+    success: function (data) {
+      console.log(data);
+      displayPlayersExceptNull(data);
+    },
+    error: function (error) {
+      console.log(error);
+      alert("Please try again.");
+    }
+  })
+}
+
+function displayPlayersExceptNull(data) {
+  var count = 0;
+  for (let i = 0; i < 10; i++) {
+    if (data.players[i] != null) {
+      let player = document.getElementById("player" + (count + 1));
+      if (data.owner.name === data.players[i].name) {
+        player.textContent = data.players[i].name + "(Owner)";
+      } else {
+        player.textContent = data.players[i].name;
+      }
+      player.style.fontSize = "20px";
+      count++;
+    }
+  }
+  for (let i = count; i < 10; i++) {
+    let player = document.getElementById("player" + (i + 1));
+    player.textContent = "";
+  }
 }

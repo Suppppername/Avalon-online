@@ -24,7 +24,7 @@ public class gameService {
         Game game = new Game();
         game.setID(UUID.randomUUID().toString().substring(0, 5).toUpperCase());
         game.setStatus(gameStatusEnum.NEW);
-        game.setNumPlayers(1);
+        game.setNumPlayers(0);
         gameRepo.getInstance().addGame(game);
         return game;
     }
@@ -92,10 +92,34 @@ public class gameService {
         if (game.getNumPlayers() < 5) {
             throw new gameException("Not enough players");
         }
-
-
-
-
+        ArrayList<Integer> randomArray = randomArray(game.getNumPlayers());
+        ArrayList<Player> players = game.getPlayers();
+        players.get(randomArray.get(0)).setCharacter(charactersEnum.MERLIN);
+        players.get(randomArray.get(0)).setSide(sideEnum.GOOD);
+        players.get(randomArray.get(1)).setCharacter(charactersEnum.ASSASSIN);
+        players.get(randomArray.get(1)).setSide(sideEnum.EVIL);
+        for (int i = 0; i < setting.getMinions(); i++) {
+            players.get(randomArray.get(i + 2)).setCharacter(charactersEnum.MINION);
+            players.get(randomArray.get(i + 2)).setSide(sideEnum.EVIL);
+        }
+        for (int i = 0; i < setting.getServant(); i++) {
+            players.get(randomArray.get(i + 2 + setting.getMinions())).setCharacter(charactersEnum.SERVANT);
+            players.get(randomArray.get(i + 2 + setting.getMinions())).setSide(sideEnum.GOOD);
+        }
+        if (setting.getPercival() == 1) {
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + 2)).setCharacter(charactersEnum.PERCIVAL);
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + 2)).setSide(sideEnum.GOOD);
+        }
+        if (setting.getMorgana() == 1) {
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + 2)).setCharacter(charactersEnum.MORGANA);
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + 2)).setSide(sideEnum.EVIL);
+        }
+        if (setting.getMordred() == 1) {
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + setting.getMorgana() + 2)).setCharacter(charactersEnum.MORDRED);
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + setting.getMorgana() + 2)).setSide(sideEnum.EVIL);
+        }
+        Collections.shuffle(players);
+        game.setPlayers(players);
         game.setStatus(gameStatusEnum.IN_PROGRESS);
         gameRepo.getInstance().addGame(game);
         return game;
