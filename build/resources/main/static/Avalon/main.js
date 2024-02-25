@@ -3,7 +3,7 @@ let stompClient;
 let gameID;
 let name;
 let gameConfirmed = false;
-let characterNotified = false;
+let teamOrTask; // 1 == task, 0 == team
 
 // Session storage:
 // firstTime: 1 if it's the first time the user enters the game, 0 otherwise
@@ -22,10 +22,111 @@ function connectToSocket(gameID) {
           if (data.status === "NEW") {
             console.log(data); // for debugging, not visible for users for fairness reasons
             displayPlayers(data);
-          }else if (data.status === "IN_PROGRESS") {
+          }else if (data.status === "CHARACTER_NOTIFY") {
             gameSetup(data);
+            firstLeaderPropose(data);
+          }else if (data.status === "VOTE_TEAM") {
+            voteTeam(data)
           }
         });
+  });
+}
+
+function approve(){
+  if (teamOrTask === 0) { // team
+    $.ajax({
+      url: url + "/game/Avalon/" + gameID + "/approveTeam",
+      type: 'POST',
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({
+        "approve": true
+      }),
+      success: function (data) {
+        console.log(data);
+        document.getElementById('approve').style.display = "none";
+        document.getElementById('reject').style.display = "none";
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  }
+}
+
+function reject() {
+  if (teamOrTask === 0) { // team
+    $.ajax({
+      url: url + "/game/Avalon/" + gameID + "/rejectTeam",
+      type: 'POST',
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({
+        "approve": false
+      }),
+      success: function (data) {
+        console.log(data);
+        document.getElementById('approve').style.display = "none";
+        document.getElementById('reject').style.display = "none";
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  }
+}
+
+
+function voteTeam(data) {
+  document.getElementById('playerProposed').textContent =  "Player proposed: " + data.playerProposed;
+  document.getElementById('approve').style.display = "inline";
+  document.getElementById('reject').style.display = "inline";
+}
+function firstLeaderPropose(data) {
+  teamOrTask = 0;
+  if (data.leader === name) {
+    let proposalTest = "Please propose a team of " + data.proposal[data.task]+" by clicking names."
+    document.getElementById('submitButtons').style.display = "block";
+    document.getElementById('proposal').textContent = proposalTest;
+      const playerSpans = document.querySelectorAll('.seat span');
+      const proposalArea = document.getElementById('playerProposed');
+      let selectedPlayers = [];
+      function handlePlayerClick(event) {
+        const playerName = event.target.textContent;
+        const isPlayerSelected = selectedPlayers.includes(playerName);
+
+        if (isPlayerSelected) {
+          selectedPlayers = selectedPlayers.filter(name => name !== playerName);
+        } else {
+          selectedPlayers.push(playerName);
+        }
+        // Update the proposal area with the names of selected players
+        proposalArea.textContent = selectedPlayers.join(', ');
+      }
+      playerSpans.forEach(
+          player => player.addEventListener('click', handlePlayerClick));
+  } else {
+    document.getElementById('proposal').textContent = "Waiting for " + data.leader + " to propose a team";
+  }
+}
+
+function submitProposal() {
+  let selectedPlayers = document.getElementById('playerProposed').textContent;
+  let selectedPlayersArray = selectedPlayers? selectedPlayers.split(', '): [];
+  $.ajax({
+    url: url + "/game/Avalon/" + gameID + "/proposeTeam",
+    type: 'POST',
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(selectedPlayersArray),
+    success: function (data) {
+      console.log(data);
+      document.getElementById('submitButtons').style.display = "none";
+    },
+    error: function (error) {
+      console.log(error);
+      alert("Incorrect number of players selected");
+    }
   });
 }
 
@@ -34,6 +135,14 @@ function gameSetup(data) {
   displayPlayersExceptNull(data);
   document.getElementById('pregameInfo').style.display = "none";
   document.getElementById('gameInfo').style.display = "block";
+  // numbers in dots
+for (let i = 1; i < 6; i++) {
+    document.getElementById("dot" + (i)).textContent = data.proposal[i - 1];
+  }
+  for (let i = 1; i < data.proposal[data.task] + 1; i++) {
+    document.getElementById("checkbox" + (i)).style.display = "inline";
+  }
+document.getElementById('failsRemain').textContent = "fails remaining: " + data.failsRemain;
   var character = data.players.find(
       player => player != null && player.name === name).character;
   document.getElementById('character').textContent= "Your character is: " + character;
@@ -54,15 +163,19 @@ function gameSetup(data) {
     alert("Your character is " + character + ". The evil players are: " + evilPlayersNames);
   }else if (character === "PERCIVAL") {
     document.getElementById('character').style.color = "#009933"
-    var validPlayers = data.players.filter((player) => player != null);
-    var morgana = validPlayers.find(player => player.character === "MORGANA");
-    var merlin = validPlayers.find(player => player.character === "MERLIN");
+    let validPlayers = data.players.filter((player) => player != null);
+    let morgana = validPlayers.find(player => player.character === "MORGANA");
+    let merlin = validPlayers.find(player => player.character === "MERLIN");
     for (let i = 1; i < 11; i++) {
          if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
           document.getElementById("player" + i).style.color = "#009933";
         }
     }
-    alert("Your character is Percival. The two characters are: " + morgana.name + " and " + merlin.name);
+    if (!morgana) {
+      alert("Your character is Percival. There is no Morgana in the game. Merlin is " + merlin.name);
+    }else{
+        alert("Your character is Percival. The two characters are: " + morgana.name + " and " + merlin.name);
+      }
   }else if (character === "MORGANA" || character === "ASSASSIN" || character === "MINION" || character === "MORDRED") {
     document.getElementById('character').style.color = "#ff6666";
     var validPlayers = data.players.filter((player) => player != null);
@@ -153,6 +266,8 @@ function enter() {
       dataType: "json",
       contentType: "application/json",
       success: function (data) {
+        name = sessionStorage.getItem("name");
+        gameID = sessionStorage.getItem("gameID");
         console.log(data);
         gameID = data.id;
         connectToSocket(gameID);
@@ -221,22 +336,34 @@ function openSettings() {
       document.getElementById("currentPlayers").textContent = count.toString();
       if (count <= 5) {
         document.getElementById("goodSide").textContent = 3;
+        goodside = 3;
         document.getElementById("badSide").textContent = 2;
+        badside = 2;
       } else if (count === 6) {
         document.getElementById("goodSide").textContent = 4;
+        goodside = 4;
         document.getElementById("badSide").textContent = 2;
+        badside = 2;
       } else if (count === 7) {
         document.getElementById("goodSide").textContent = 4;
+        goodside = 4;
         document.getElementById("badSide").textContent = 3;
+        badside = 3;
       } else if (count === 8) {
         document.getElementById("goodSide").textContent = 5;
+        goodside = 5;
         document.getElementById("badSide").textContent = 3;
+        badside = 3;
       } else if (count === 9) {
         document.getElementById("goodSide").textContent = 6;
+        goodside = 6;
         document.getElementById("badSide").textContent = 3;
+        badside = 3;
       } else if (count === 10) {
         document.getElementById("goodSide").textContent = 6;
+        goodside = 6;
         document.getElementById("badSide").textContent = 4;
+        badside = 4;
       }
     }
   });
@@ -306,8 +433,10 @@ function displayPlayers(game) {
       let player = document.getElementById("player" + (i + 1));
       if (game.owner.name === game.players[i].name) {
         player.textContent = game.players[i].name + "(owner)";
+        player.style.cursor = "pointer";
       }else{
         player.textContent = game.players[i].name;
+        player.style.cursor = "pointer";
       }
       player.style.fontSize = "20px";
     }
@@ -340,9 +469,19 @@ function confirm(){
               'morgana') + document.getElementById('percival')
           + document.getElementById('minions') + document.getElementById(
               'servant') + 2 < 5) {
-        alert("Incorrect setting! Please adjust the number for each character");
+        alert("Incorrect setting1! Please adjust the number for each character");
         return;
       }
+
+      // if (parseInt(document.getElementById('mordred')) + parseInt(document.getElementById(
+      //     'morgana')) + parseInt(document.getElementById('minions')) != badside - 1) {
+      //   alert("Incorrect setting2! Please adjust the number for each character");
+      //   return;
+      // }
+      // if (parseInt(document.getElementById('percival')) + parseInt(document.getElementById('servant')) != goodside - 1) {
+      //   alert("Incorrect setting3! Please adjust the number for each character");
+      //   return;
+      // }
       gameConfirmed = true;
       closeSettings();
       alert("Game is ready to start");

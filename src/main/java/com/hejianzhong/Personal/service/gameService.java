@@ -1,14 +1,19 @@
 package com.hejianzhong.Personal.service;
 
+import com.hejianzhong.Personal.exception.gameException;
+import com.hejianzhong.Personal.model.Game;
+import com.hejianzhong.Personal.model.Player;
+import com.hejianzhong.Personal.model.charactersEnum;
+import com.hejianzhong.Personal.model.gameStatusEnum;
+import com.hejianzhong.Personal.model.setting;
+import com.hejianzhong.Personal.model.sideEnum;
 import com.hejianzhong.Personal.repository.gameRepo;
-import com.hejianzhong.Personal.model.*;
-import com.hejianzhong.Personal.exception.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class gameService {
 
     public final int MAX_PLAYERS = 10;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public Game createGame() {
         Game game = new Game();
@@ -60,17 +66,6 @@ public class gameService {
         return game;
     }
 
-    public Game collectVote(vote vote, String gameID) {
-        gameID = gameID.toUpperCase();
-        if (!gameRepo.getInstance().getGames().containsKey(gameID)) {
-            throw new gameException("Game not found");
-        }
-        Game game = gameRepo.getInstance().getGames().get(gameID);
-        if (game.getStatus() != gameStatusEnum.IN_PROGRESS) {
-            throw new gameException("Game is not in progress");
-        }
-        return game;
-    }
 
     public Game getGame(String gameID) {
         gameID = gameID.toUpperCase();
@@ -92,6 +87,51 @@ public class gameService {
         if (game.getNumPlayers() < 5) {
             throw new gameException("Not enough players");
         }
+
+        if (game.getNumPlayers() > MAX_PLAYERS) {
+            throw new gameException("Too many players");
+        }
+
+        if (game.getNumPlayers() == 5) {
+            ArrayList<Integer> temp = new ArrayList<>(5);
+            temp.add(2);
+            temp.add(3);
+            temp.add(2);
+            temp.add(3);
+            temp.add(3);
+            game.setProposal(temp);
+        }
+        if (game.getNumPlayers() == 6) {
+            ArrayList<Integer> temp = new ArrayList<>(5);
+            temp.add(2);
+            temp.add(3);
+            temp.add(4);
+            temp.add(3);
+            temp.add(4);
+            game.setProposal(temp);
+        }
+
+        // two more fails
+        if (game.getNumPlayers() == 7) {
+            ArrayList<Integer> temp = new ArrayList<>(5);
+            temp.add(2);
+            temp.add(3);
+            temp.add(3);
+            temp.add(4);
+            temp.add(4);
+            game.setProposal(temp);
+        }
+
+        if (game.getNumPlayers() == 8 || game.getNumPlayers() == 9 || game.getNumPlayers() == 10) {
+            ArrayList<Integer> temp = new ArrayList<>(5);
+            temp.add(3);
+            temp.add(4);
+            temp.add(4);
+            temp.add(5);
+            temp.add(5);
+            game.setProposal(temp);
+        }
+
         ArrayList<Integer> randomArray = randomArray(game.getNumPlayers());
         ArrayList<Player> players = game.getPlayers();
         players.get(randomArray.get(0)).setCharacter(charactersEnum.MERLIN);
@@ -103,29 +143,46 @@ public class gameService {
             players.get(randomArray.get(i + 2)).setSide(sideEnum.EVIL);
         }
         for (int i = 0; i < setting.getServant(); i++) {
-            players.get(randomArray.get(i + 2 + setting.getMinions())).setCharacter(charactersEnum.SERVANT);
+            players.get(randomArray.get(i + 2 + setting.getMinions()))
+                .setCharacter(charactersEnum.SERVANT);
             players.get(randomArray.get(i + 2 + setting.getMinions())).setSide(sideEnum.GOOD);
         }
         if (setting.getPercival() == 1) {
-            players.get(randomArray.get(setting.getMinions() + setting.getServant() + 2)).setCharacter(charactersEnum.PERCIVAL);
-            players.get(randomArray.get(setting.getMinions() + setting.getServant() + 2)).setSide(sideEnum.GOOD);
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + 2))
+                .setCharacter(charactersEnum.PERCIVAL);
+            players.get(randomArray.get(setting.getMinions() + setting.getServant() + 2))
+                .setSide(sideEnum.GOOD);
         }
         if (setting.getMorgana() == 1) {
-            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + 2)).setCharacter(charactersEnum.MORGANA);
-            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + 2)).setSide(sideEnum.EVIL);
+            players.get(randomArray.get(
+                    setting.getMinions() + setting.getServant() + setting.getPercival() + 2))
+                .setCharacter(charactersEnum.MORGANA);
+            players.get(randomArray.get(
+                    setting.getMinions() + setting.getServant() + setting.getPercival() + 2))
+                .setSide(sideEnum.EVIL);
         }
         if (setting.getMordred() == 1) {
-            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + setting.getMorgana() + 2)).setCharacter(charactersEnum.MORDRED);
-            players.get(randomArray.get(setting.getMinions() + setting.getServant() + setting.getPercival() + setting.getMorgana() + 2)).setSide(sideEnum.EVIL);
+            players.get(randomArray.get(
+                setting.getMinions() + setting.getServant() + setting.getPercival()
+                    + setting.getMorgana() + 2)).setCharacter(charactersEnum.MORDRED);
+            players.get(randomArray.get(
+                setting.getMinions() + setting.getServant() + setting.getPercival()
+                    + setting.getMorgana() + 2)).setSide(sideEnum.EVIL);
         }
         Collections.shuffle(players);
         game.setPlayers(players);
-        game.setStatus(gameStatusEnum.IN_PROGRESS);
+        game.setStatus(gameStatusEnum.CHARACTER_NOTIFY);
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i) != null) {
+                game.setLeader(players.get(i).getName());
+                break;
+            }
+        }
         gameRepo.getInstance().addGame(game);
         return game;
     }
 
-    private ArrayList<Integer> randomArray (int numPlayers) {
+    private ArrayList<Integer> randomArray(int numPlayers) {
         ArrayList<Integer> randomArray = new ArrayList<Integer>();
         for (int i = 0; i < numPlayers; i++) {
             randomArray.add(i);
@@ -134,6 +191,90 @@ public class gameService {
         return randomArray;
     }
 
+    public Game proposeTeam(ArrayList<String> proposal, String gameID) {
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        if (proposal.size() != game.getProposal().get(game.getTask())) {
+            throw new gameException("Wrong number of players");
+        }
+        game.setStatus(gameStatusEnum.TEAM_PROPOSAL);
+        game.setPlayerProposed(proposal);
+        game.setStatus(gameStatusEnum.VOTE_TEAM);
+        return game;
+    }
+
+
+    public Game approveTeam(String gameID) {
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        game.getVote().add(true);
+        if (game.getVote().size() == game.getNumPlayers()) {
+            game = countVotes(game);
+            simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        }
+        return game;
+    }
+
+    public Game rejectTeam(String gameID) {
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        game.getVote().add(false);
+        if (game.getVote().size() == game.getProposal().get(game.getTask())) {
+            game = countVotes(game);
+            simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+
+        }
+        return game;
+    }
+
+    public Game countVotes(Game game) {
+        int count = 0;
+        for (int i = 0; i < game.getVote().size(); i++) {
+            if (game.getVote().get(i)) {
+                count++;
+            }
+        }
+        if (count > game.getProposal().get(game.getTask()) / 2) {// success if approves > 50%
+            game.setFailsRemain(5);// refresh fails
+            game.setStatus(gameStatusEnum.VOTE_TASK); // set status to vote task
+            newLeader(game);
+        } else { // fail
+            game.setFailsRemain(game.getFailsRemain() - 1);
+            if (game.getFailsRemain() == 0) {
+                game.setStatus(gameStatusEnum.FINISHED);
+            } else {
+                game.setStatus(gameStatusEnum.TEAM_PROPOSAL);
+                game.setPlayerProposed(new ArrayList<>());// clear player proposed
+                newLeader(game);
+            }
+
+        }
+        return game;
+    }
+
+    public void newLeader(Game game) {
+        int temp = 0;// find the new leader for next round
+        //
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            if (game.getPlayers().get(i) != null && game.getPlayers().get(i).getName()
+                .equals(game.getLeader())) {
+                temp = i + 1;
+                if (temp == game.getPlayers().size()) {
+                    temp = 0;
+                }
+                break;
+            }
+        }
+        while (temp < game.getPlayers().size()) {
+            if (game.getPlayers().get(temp) != null) {
+                break;
+            }
+            if (temp + 1 == game.getPlayers().size()) {
+                temp = 0;
+            } else {
+                temp++;
+            }
+        }
+        game.setLeader(game.getPlayers().get(temp).getName());
+        game.setVote(new ArrayList<>());// clear votes
+    }
 
 
 }

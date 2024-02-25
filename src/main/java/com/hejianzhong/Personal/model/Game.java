@@ -19,31 +19,28 @@ public class Game {
     private int numPlayers;
     private ArrayList<Player> players; // 1 - 10
     private Player owner;
-    private int playerTurn;// 0 - 9
-    private ArrayList<Boolean> rounds;
-    private ArrayList<Boolean> tasks;
+    private int task;
     private ArrayList<Boolean> vote;
-//    private HashMap<Integer, List> setUpMap = new HashMap<Integer, List>();
-    private int[] setUp;
-    private boolean isVote;
+    private ArrayList<Integer> proposal;
+    private String leader;
+    private ArrayList<String> playerProposed;
+    private int failsRemain;
 
     public Game() {
-        this.playerTurn=0;
         this.numPlayers = 0;
         this.players = new ArrayList<Player>(10);
         for (int i = 0; i < 10; i++) {
             players.add(null);
         }
-        this.rounds = new ArrayList<Boolean>(5);
-        this.tasks = new ArrayList<Boolean>(5);
-        this.vote = new ArrayList<Boolean>(10);
+        this.vote = new ArrayList<Boolean>();
         this.owner = null;
-        for (int i = 0; i < 5; i++) {
-            rounds.add(null);
-            tasks.add(null);
-        }
-        this.isVote = false;
-        this.setUp = new int[2];
+        this.leader = null;
+        this.status= gameStatusEnum.NEW;
+        this.proposal = new ArrayList<Integer>();
+        this.playerProposed = new ArrayList<String>();
+        this.task = 0;
+        this.failsRemain = 5;
+
 //        setUpMap.put(5, Arrays.asList(3,2));
 //        setUpMap.put(6, Arrays.asList(4,2));
 //        setUpMap.put(7, Arrays.asList(4,3));

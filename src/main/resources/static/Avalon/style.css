@@ -211,3 +211,21 @@ footer {
     text-decoration: none;
     cursor: pointer;
 }
+
+.dots {
+    text-align: center;
+}
+.dot {
+    height: 20px;
+    width: 20px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.checkboxes {
+    margin-bottom: 10px;
+}
+.checkboxes span {
+    margin-right: 10px;
+}

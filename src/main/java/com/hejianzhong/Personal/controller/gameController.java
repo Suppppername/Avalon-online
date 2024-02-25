@@ -2,6 +2,7 @@ package com.hejianzhong.Personal.controller;
 
 import com.hejianzhong.Personal.model.*;
 
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.hejianzhong.Personal.service.*;
@@ -32,18 +33,12 @@ public class gameController {
     }
 
     @PostMapping("/Avalon/join/{gameID}")
-    public ResponseEntity<Game> join(@RequestBody Player player, @PathVariable(value = "gameID") String gameID) {
+    public ResponseEntity<Game> join(@RequestBody Player player,
+        @PathVariable(value = "gameID") String gameID) {
         log.info("Connect to game request : {}" + "/n gameID : " + gameID, player);
         Game game = service.joinGame(player, gameID);
         simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
         return ResponseEntity.ok(game);
-    }
-
-
-    @PostMapping("/Avalon/{gameID}/collectVote")
-    public ResponseEntity<Game> collectVote(@RequestBody vote vote, @PathVariable(value = "gameID") String gameID) {
-        log.info("vote : {}", vote);
-        return ResponseEntity.ok(service.collectVote(vote, gameID));
     }
 
     @GetMapping("/Avalon/{gameID}") // look up game state from the server
@@ -53,26 +48,32 @@ public class gameController {
     }
 
     @PostMapping("/Avalon/{gameID}/start")
-    public ResponseEntity<Game> startGame(@RequestBody setting setting,@PathVariable(value = "gameID") String gameID) {
+    public ResponseEntity<Game> startGame(@RequestBody setting setting,
+        @PathVariable(value = "gameID") String gameID) {
         log.info("Start game request : {}", gameID);
         Game game = service.startGame(gameID, setting);
         simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
         return ResponseEntity.ok(game);
     }
 
+    @PostMapping("/Avalon/{gameID}/proposeTeam")
+    public ResponseEntity<Game> proposeTeam(@RequestBody ArrayList<String> proposal,
+        @PathVariable(value = "gameID") String gameID) {
+        log.info("Propose team request : {}", proposal);
+        Game game = service.proposeTeam(proposal, gameID);
+        simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        return ResponseEntity.ok(game);
+    }
 
+    @PostMapping("/Avalon/{gameID}/approveTeam")
+    public ResponseEntity<Game> approveTeam(@PathVariable(value = "gameID") String gameID) {
+        Game game = service.approveTeam(gameID);
+        return ResponseEntity.ok(game);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @PostMapping("/Avalon/{gameID}/rejectTeam")
+    public ResponseEntity<Game> rejectTeam(@PathVariable(value = "gameID") String gameID) {
+        Game game = service.rejectTeam(gameID);
+        return ResponseEntity.ok(game);
+    }
 }

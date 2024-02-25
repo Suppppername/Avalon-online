@@ -110,7 +110,7 @@
 
             In the Quest phase those players selected to be on the team will determine if the Quest
             is
-            succesfull.</p>
+            successful.</p>
         <h3 align='left'> Team building phase</h3>
         <p align='left'>Team Assignment: After appropriate discussion, the leader takes the required
             number of Team tokens and assigns each team token to any player. The leader can be on
@@ -166,7 +166,7 @@
             opportunity to win the game by correctly naming which of the good players is Merlin.
 
             Without revealing any character cards, the evil players discuss and the player with the
-            assasin character card will name one good player as Merlin.
+            assassin character card will name one good player as Merlin.
 
             If the named player is Merlin, then Evil players win. If the evil players do not name
             Merlin,
@@ -197,7 +197,7 @@
         <div class="flex-side">
             <div class="seat">
                 <!--        <div class="ribbon"> 1</div>-->
-                <span id="player1">player #1</span>
+                <span id="player1" >player #1</span>
             </div>
             <div class="seat">
                 <!--        <div class="ribbon"> 2</div>-->
@@ -226,32 +226,56 @@
                     <p style="color: #797777" id="hiddenParagraph"> Copied! </p>
                     <button class="start-game-button" onclick="startGame()">Start Game</button>
                 </div>
-                <div class="circle-info" id = "gameInfo">
+
+
+                <div class="circle-info" id = "gameInfo" style="display: none">
                     <p> <span id = 'character'></span> </p>
+                    <p> <span id = 'proposal'></span> </p>
+                    <p> <span id = 'playerProposed'></span></p>
+                    <p> <span id = 'gameStatus'></span> This is the game status</p>
+                    <div class="checkboxes">
+                        <span id="checkbox1" style="display: none">&#x2610;</span> <!-- &#x2713 is check; -->
+                        <span id="checkbox2" style="display: none">&#x2610;</span> <!-- &#x2717 is cross; -->
+                        <span id="checkbox3" style="display: none">&#x2610;</span> <!-- &#x2610 is empty box; -->
+                        <span id="checkbox4" style="display: none">&#x2610;</span>
+                        <span id="checkbox5" style="display: none">&#x2610;</span>
 
+
+                    </div>
+                    <div class="dots">
+                        <span class="dot" id="dot1"></span>
+                        <span class="dot" id="dot2"></span>
+                        <span class="dot" id="dot3"></span>
+                        <span class="dot" id="dot4"></span>
+                        <span class="dot" id="dot5"></span>
+                    </div>
+                    <p> <span id = 'failsRemain'></span></p>
+                    <div class="buttons" id="voteButtons">
+                        <button onclick="approve()" style="color: #009933;background-color: #f0f0f0;display: none" id="approve">Approve</button>
+                        <button onclick="reject()" style="color: #ff6666;background-color: #f0f0f0;display: none" id ="reject">Reject</button>
+                    </div>
+                    <div class="buttons" id="submitButtons" style="display:none;">
+                        <button onclick="submitProposal()" style="background-color: #f0f0f0"> Submit</button>
+                    </div>
+
+                    <p style="display: none" id="voted">voted!</p>
                 </div>
-
             </div>
         </div>
         <div class="flex-side">
             <div class="seat">
-                <!--        <div class="ribbon-left"> 6</div>-->
                 <span id="player6">player #6</span>
             </div>
             <div class="seat">
-                <!--        <div class="ribbon-left"> 7</div>-->
                 <span id="player7">player #7</span>
             </div>
             <div class="seat">
-                <!--        <div class="ribbon-left"> 8</div>-->
                 <span id="player8">player #8</span>
             </div>
             <div class="seat">
-                <!--        <div class="ribbon-left"> 9</div>-->
                 <span id="player9">player #9</span>
             </div>
             <div class="seat">
-                <!--        <div class="ribbon-left"> 10</div>-->
                 <span id="player10">player #10</span>
             </div>
 
@@ -265,5 +289,4 @@
     <p>Email: hejianzhong@berkeley.edu</p>
 </footer>
 </body>
-
 </html>
