@@ -24,12 +24,110 @@ function connectToSocket(gameID) {
             displayPlayers(data);
           }else if (data.status === "CHARACTER_NOTIFY") {
             gameSetup(data);
-            firstLeaderPropose(data);
-          }else if (data.status === "VOTE_TEAM") {
+            firstLeaderPropose(data); // first leader propose
+          }else if (data.status === "VOTE_TEAM") { // vote team
             voteTeam(data)
+          }else if (data.status === "TEAM_PROPOSAL") { // fails
+            leaderPropose(data);
+          }else if (data.status === "VOTE_TASK") { // successes
+            voteTask(data);
           }
         });
   });
+}
+
+function voteTask(data) {
+  for (let i = 1 ; i < data.numPlayers + 1; i++) {
+    document.getElementById("checkbox" + i).style.display = "inline";
+    if (data.vote[i - 1]) {
+      document.getElementById("checkbox" + i).textContent = "\u2713";
+      document.getElementById("checkbox" + i).style.color = "#009933"
+    } else {
+      document.getElementById("checkbox" + i).textContent = "\u2717";
+      document.getElementById("checkbox" + i).style.color = "#ff6666"
+    }
+  }
+  teamOrTask  = 1;
+  setTimeout(() => {
+    document.getElementById('failsRemain').textContent = "fails remaining: " + data.failsRemain;
+    document.getElementById('proposal').style.display = "none";
+    document.getElementById('playerProposed').textContent= "task " + (data.task + 1) + ": " + data.playerProposed;
+    for (let i = 1; i < 11 ; i++) {
+      document.getElementById("checkbox" + i).style.display = "none";
+      document.getElementById("checkbox" + i).style.color = "black";
+      document.getElementById("checkbox" + i).textContent = "\u2610";
+    }
+    for (let i = 1; i < data.playerProposed.length + 1 ; i++) {
+      document.getElementById("checkbox" + i).style.display = "inline";
+    }
+
+    for (let i = 0; i < data.playerProposed.length; i++) {
+      if (name === data.playerProposed[i]) {
+        document.getElementById('approve').style.display = "inline";
+        document.getElementById('reject').style.display = "inline";
+      }
+    }
+  },2500)
+
+
+
+
+
+}
+
+function leaderPropose(data) {
+  teamOrTask = 0;
+  for (let i = 1 ; i < data.vote.length + 1; i++) {
+    document.getElementById("checkbox" + i).style.display = "inline";
+    if (data.vote[i - 1]) {
+      document.getElementById("checkbox" + i).textContent = "\u2713";
+      document.getElementById("checkbox" + i).style.color = "#009933"
+    } else {
+      document.getElementById("checkbox" + i).textContent = "\u2717";
+      document.getElementById("checkbox" + i).style.color = "#ff6666"
+    }
+    document.getElementById('failsRemain').textContent = "fails remaining: " + data.failsRemain;
+  }
+
+  for (let i = 1; i < 6; i++) {
+    if (data.tasks[i - 1]!= null) {
+      if (data.tasks[i - 1]) {
+        document.getElementById("dot" + (i)).style.backgroundColor = "#009933";
+      } else {
+        document.getElementById("dot" + (i)).style.backgroundColor = "#ff6666";
+      }
+    }
+
+  }
+
+  if (data.leader === name) {
+    document.getElementById('submitButtons').style.display = "block";
+    document.getElementById('proposal').style.display = "block";
+    document.getElementById('proposal').textContent = "Please propose a team of " + data.proposal[data.task]+" by clicking names."
+    const playerSpans = document.querySelectorAll('.seat span');
+    const proposalArea = document.getElementById('playerProposed');
+    proposalArea.style.display = "block";
+    proposalArea.textContent = "";
+    let selectedPlayers = [];
+    function handlePlayerClick(event) {
+      const playerName = event.target.textContent;
+      const isPlayerSelected = selectedPlayers.includes(playerName);
+
+      if (isPlayerSelected) {
+        selectedPlayers = selectedPlayers.filter(name => name !== playerName);
+      } else {
+        selectedPlayers.push(playerName);
+      }
+      // Update the proposal area with the names of selected players
+      proposalArea.textContent = selectedPlayers.join(', ');
+    }
+    playerSpans.forEach(
+        player => player.addEventListener('click', handlePlayerClick));
+  } else {
+    document.getElementById('proposal').style.display = "block";
+    document.getElementById('proposal').textContent = "Waiting for " + data.leader + " to propose a team";
+    document.getElementById('playerProposed').style.display = "none";
+  }
 }
 
 function approve(){
@@ -51,6 +149,24 @@ function approve(){
         console.log(error);
       }
     });
+  }else{ // task
+    $.ajax({
+      url: url + "/game/Avalon/" + gameID + "/approveTask",
+      type: 'POST',
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({
+        "approve": true
+      }),
+      success: function (data) {
+        console.log(data);
+        document.getElementById('approve').style.display = "none";
+        document.getElementById('reject').style.display = "none";
+      },error: function (error) {
+        console.log(error);
+      }
+
+    })
   }
 }
 
@@ -78,9 +194,17 @@ function reject() {
 
 
 function voteTeam(data) {
+
+  for (let i = 1; i < data.numPlayers + 1; i++) {
+    document.getElementById("checkbox" + i).style.display = "inline";
+    document.getElementById("checkbox" + i).textContent = "\u2610";
+    document.getElementById("checkbox" + i).style.color = "black";
+  }
+  document.getElementById('playerProposed').style.display = "block";
   document.getElementById('playerProposed').textContent =  "Player proposed: " + data.playerProposed;
   document.getElementById('approve').style.display = "inline";
   document.getElementById('reject').style.display = "inline";
+
 }
 function firstLeaderPropose(data) {
   teamOrTask = 0;
@@ -139,7 +263,7 @@ function gameSetup(data) {
 for (let i = 1; i < 6; i++) {
     document.getElementById("dot" + (i)).textContent = data.proposal[i - 1];
   }
-  for (let i = 1; i < data.proposal[data.task] + 1; i++) {
+  for (let i = 1; i < data.numPlayers + 1; i++) {
     document.getElementById("checkbox" + (i)).style.display = "inline";
   }
 document.getElementById('failsRemain').textContent = "fails remaining: " + data.failsRemain;
@@ -153,9 +277,9 @@ document.getElementById('failsRemain').textContent = "fails remaining: " + data.
     var evilPlayersNames = evilPlayers.map(player => player.name);
     for (let i = 1; i < 11; i++) {
       for (let j = 0; j < evilPlayersNames.length; j++) {
-        if (document.getElementById("player" + i).textContent === evilPlayersNames[j] || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === evilPlayersNames[j])) {
+        if (document.getElementById("player" + i).textContent === evilPlayersNames[j]) {
           document.getElementById("player" + i).style.color = "#ff6666";
-        }else if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
+        }else if (document.getElementById("player" + i).textContent === name){
           document.getElementById("player" + i).style.color = "#009933";
         }
       }
@@ -167,7 +291,7 @@ document.getElementById('failsRemain').textContent = "fails remaining: " + data.
     let morgana = validPlayers.find(player => player.character === "MORGANA");
     let merlin = validPlayers.find(player => player.character === "MERLIN");
     for (let i = 1; i < 11; i++) {
-         if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
+         if (document.getElementById("player" + i).textContent === name){
           document.getElementById("player" + i).style.color = "#009933";
         }
     }
@@ -186,7 +310,7 @@ document.getElementById('failsRemain').textContent = "fails remaining: " + data.
     var evilPlayersNames = evilPlayers.map(player => player.name);
     for (let i = 1; i < 11; i++) {
       for (let j = 0; j < evilPlayersNames.length; j++) {
-        if (document.getElementById("player" + i).textContent === evilPlayersNames[j] || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === evilPlayersNames[j])) {
+        if (document.getElementById("player" + i).textContent === evilPlayersNames[j]) {
           document.getElementById("player" + i).style.color = "#ff6666";
         }
       }
@@ -195,7 +319,7 @@ document.getElementById('failsRemain').textContent = "fails remaining: " + data.
   }else if (character === "SERVANT") {
     document.getElementById('character').style.color = "#009933";
     for (let i = 1; i < 11; i++) {
-      if (document.getElementById("player" + i).textContent === name || (document.getElementById("player" + i).textContent.length>7 && document.getElementById("player" + i).textContent.slice(0,-7) === name)){
+      if (document.getElementById("player" + i).textContent === name){
           document.getElementById("player" + i).style.color = "#009933";
         }
     }
@@ -256,7 +380,7 @@ function enter() {
       },
       error: function (error) {
         console.log(error);
-        alert("error joining the game, please close browser and try again, possibly name issues");
+        alert("error joining the game, please close and try again");
       },
     });
   } else {
@@ -432,7 +556,7 @@ function displayPlayers(game) {
     if (game.players[i] != null) {
       let player = document.getElementById("player" + (i + 1));
       if (game.owner.name === game.players[i].name) {
-        player.textContent = game.players[i].name + "(owner)";
+        player.textContent = game.players[i].name;
         player.style.cursor = "pointer";
       }else{
         player.textContent = game.players[i].name;
@@ -528,7 +652,7 @@ function displayPlayersExceptNull(data) {
     if (data.players[i] != null) {
       let player = document.getElementById("player" + (count + 1));
       if (data.owner.name === data.players[i].name) {
-        player.textContent = data.players[i].name + "(Owner)";
+        player.textContent = data.players[i].name;
       } else {
         player.textContent = data.players[i].name;
       }

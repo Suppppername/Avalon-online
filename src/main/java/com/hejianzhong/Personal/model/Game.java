@@ -21,10 +21,12 @@ public class Game {
     private Player owner;
     private int task;
     private ArrayList<Boolean> vote;
+    private ArrayList<Boolean> tasks;
     private ArrayList<Integer> proposal;
     private String leader;
     private ArrayList<String> playerProposed;
     private int failsRemain;
+    private boolean goodWins;
 
     public Game() {
         this.numPlayers = 0;
@@ -40,6 +42,9 @@ public class Game {
         this.playerProposed = new ArrayList<String>();
         this.task = 0;
         this.failsRemain = 5;
+        this.tasks= new ArrayList<Boolean>();
+        this.goodWins = true;
+
 
 //        setUpMap.put(5, Arrays.asList(3,2));
 //        setUpMap.put(6, Arrays.asList(4,2));

@@ -196,6 +196,7 @@ public class gameService {
         if (proposal.size() != game.getProposal().get(game.getTask())) {
             throw new gameException("Wrong number of players");
         }
+        game.setVote(new ArrayList<Boolean>());
         game.setStatus(gameStatusEnum.TEAM_PROPOSAL);
         game.setPlayerProposed(proposal);
         game.setStatus(gameStatusEnum.VOTE_TEAM);
@@ -207,7 +208,7 @@ public class gameService {
         Game game = gameRepo.getInstance().getGames().get(gameID);
         game.getVote().add(true);
         if (game.getVote().size() == game.getNumPlayers()) {
-            game = countVotes(game);
+            game = countTeam(game);
             simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
         }
         return game;
@@ -216,22 +217,22 @@ public class gameService {
     public Game rejectTeam(String gameID) {
         Game game = gameRepo.getInstance().getGames().get(gameID);
         game.getVote().add(false);
-        if (game.getVote().size() == game.getProposal().get(game.getTask())) {
-            game = countVotes(game);
+        if (game.getVote().size() == game.getNumPlayers()) {
+            game = countTeam(game);
             simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
 
         }
         return game;
     }
 
-    public Game countVotes(Game game) {
+    public Game countTeam(Game game) {
         int count = 0;
         for (int i = 0; i < game.getVote().size(); i++) {
             if (game.getVote().get(i)) {
                 count++;
             }
         }
-        if (count > game.getProposal().get(game.getTask()) / 2) {// success if approves > 50%
+        if (count > game.getNumPlayers() / 2) {// success if approves > 50%
             game.setFailsRemain(5);// refresh fails
             game.setStatus(gameStatusEnum.VOTE_TASK); // set status to vote task
             newLeader(game);
@@ -239,6 +240,7 @@ public class gameService {
             game.setFailsRemain(game.getFailsRemain() - 1);
             if (game.getFailsRemain() == 0) {
                 game.setStatus(gameStatusEnum.FINISHED);
+                game.setGoodWins(false);
             } else {
                 game.setStatus(gameStatusEnum.TEAM_PROPOSAL);
                 game.setPlayerProposed(new ArrayList<>());// clear player proposed
@@ -251,7 +253,6 @@ public class gameService {
 
     public void newLeader(Game game) {
         int temp = 0;// find the new leader for next round
-        //
         for (int i = 0; i < game.getPlayers().size(); i++) {
             if (game.getPlayers().get(i) != null && game.getPlayers().get(i).getName()
                 .equals(game.getLeader())) {
@@ -273,8 +274,94 @@ public class gameService {
             }
         }
         game.setLeader(game.getPlayers().get(temp).getName());
-        game.setVote(new ArrayList<>());// clear votes
     }
+
+    public Game approveTask(String gameID) {
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        if (game.getVote().size() == game.getNumPlayers()) {
+            game.setVote(new ArrayList<Boolean>());
+        }
+        game.getVote().add(true);
+        if (game.getVote().size() == game.getProposal().get(game.getTask())) {
+            game = countTask(game);
+            simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        }
+        return game;
+    }
+
+    public Game rejectTask(String gameID) {
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        if (game.getVote().size() == game.getNumPlayers()) {
+            game.setVote(new ArrayList<Boolean>());
+        }
+        if (game.getVote().size() == game.getProposal().get(game.getTask())) {
+            game = countTask(game);
+            simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        }
+        game.getVote().add(false);
+        return game;
+    }
+
+    public Game countTask(Game game) {
+        // if numPlayers >= 7, the fourth task needs two fails
+        int count = 0;
+        for (int i = 0; i < game.getVote().size(); i++) {
+            if (!game.getVote().get(i)) {
+                count++;
+            }
+        }
+        if ((count == 1 && game.getNumPlayers() >= 7 && game.getTask() == 3) || count == 0) { // success
+            game.getTasks().add(true);
+            game.setTask(game.getTask() + 1);
+            game = checkWinner(game);
+        } else {// fail
+            game.getTasks().add(false);
+            game.setTask(game.getTask() + 1);
+            game = checkWinner(game);
+        }
+        return game;
+    }
+
+    public Game checkWinner(Game game) {
+        int good = 0;
+        int evil = 0;
+        for (int i = 0; i < game.getTasks().size(); i++) {
+            if (game.getTasks().get(i)) {
+                good++;
+            } else {
+                evil++;
+            }
+        }
+        if (good == 3) { // good side wins
+            game.setStatus(gameStatusEnum.FINISHED);
+            game.setGoodWins(true);
+        }
+        else if (evil == 3) { // evil side wins
+            game.setStatus(gameStatusEnum.ASSASSIN);
+        } else {
+            game.setStatus(gameStatusEnum.TEAM_PROPOSAL);
+            game.setPlayerProposed(new ArrayList<>());
+            newLeader(game);
+        }
+        return game;
+    }
+
+    public Game assassin(String name, String gameID) {
+        Game game = gameRepo.getInstance().getGames().get(gameID);
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            if (game.getPlayers().get(i).getName().equals(name)) {
+                if (game.getPlayers().get(i).getCharacter() == charactersEnum.MERLIN) {
+                    game.setStatus(gameStatusEnum.FINISHED);
+                    game.setGoodWins(false);
+                } else {
+                    game.setStatus(gameStatusEnum.FINISHED);
+                    game.setGoodWins(true);
+                }
+            }
+        }
+        return game;
+    }
+
 
 
 }

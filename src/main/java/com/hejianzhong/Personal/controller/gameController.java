@@ -76,4 +76,23 @@ public class gameController {
         Game game = service.rejectTeam(gameID);
         return ResponseEntity.ok(game);
     }
+
+    @PostMapping("/Avalon/{gameID}/approveTask")
+    public ResponseEntity<Game> approveTask(@PathVariable(value = "gameID") String gameID) {
+        Game game = service.approveTask(gameID);
+        return ResponseEntity.ok(game);
+    }
+
+    @PostMapping("/Avalon/{gameID}/rejectTask")
+    public ResponseEntity<Game> rejectTask(@PathVariable(value = "gameID") String gameID) {
+        Game game = service.rejectTask(gameID);
+        return ResponseEntity.ok(game);
+    }
+
+    @PostMapping("/Avalon/{gameID}/assassin")
+    public ResponseEntity<Game> assassin(@RequestBody String name, @PathVariable(value = "gameID") String gameID) {
+        Game game = service.assassin(name, gameID);
+        simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
+        return ResponseEntity.ok(game);
+    }
 }
