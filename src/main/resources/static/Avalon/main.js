@@ -1,4 +1,4 @@
-const url = 'http://localhost:8080';
+const url = window.location;
 let stompClient;
 let gameID;
 let name;
