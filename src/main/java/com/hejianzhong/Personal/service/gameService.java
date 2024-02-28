@@ -81,8 +81,17 @@ public class gameService {
             throw new gameException("Game not found");
         }
         Game game = gameRepo.getInstance().getGames().get(gameID);
-        if (game.getStatus() != gameStatusEnum.NEW) {
-            throw new gameException("Game is already started");
+        if (game.getTasks().size() != 0){
+            game.setTasks(new ArrayList<>());
+        }
+        if (game.getProposal().size() != 0) {
+            game.setProposal(new ArrayList<>());
+        }
+        if (game.getVote().size() != 0) {
+            game.setVote(new ArrayList<>());
+        }
+        if (game.getStatus() != gameStatusEnum.NEW && game.getStatus() == gameStatusEnum.FINISHED) {
+           game.setStatus(gameStatusEnum.NEW);
         }
         if (game.getNumPlayers() < 5) {
             throw new gameException("Not enough players");
@@ -91,6 +100,8 @@ public class gameService {
         if (game.getNumPlayers() > MAX_PLAYERS) {
             throw new gameException("Too many players");
         }
+
+
 
         if (game.getNumPlayers() == 5) {
             ArrayList<Integer> temp = new ArrayList<>(5);
@@ -134,6 +145,13 @@ public class gameService {
 
         ArrayList<Integer> randomArray = randomArray(game.getNumPlayers());
         ArrayList<Player> players = game.getPlayers();
+        ArrayList<Player> temp = new ArrayList<>(10);
+        for (Player p : players) {
+            if (p != null) {
+                temp.add(p);
+            }
+        }
+        players = temp;
         players.get(randomArray.get(0)).setCharacter(charactersEnum.MERLIN);
         players.get(randomArray.get(0)).setSide(sideEnum.GOOD);
         players.get(randomArray.get(1)).setCharacter(charactersEnum.ASSASSIN);
@@ -294,11 +312,11 @@ public class gameService {
         if (game.getVote().size() == game.getNumPlayers()) {
             game.setVote(new ArrayList<Boolean>());
         }
+        game.getVote().add(false);
         if (game.getVote().size() == game.getProposal().get(game.getTask())) {
             game = countTask(game);
             simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);
         }
-        game.getVote().add(false);
         return game;
     }
 
@@ -333,15 +351,23 @@ public class gameService {
             }
         }
         if (good == 3) { // good side wins
-            game.setStatus(gameStatusEnum.FINISHED);
-            game.setGoodWins(true);
+            game.setStatus(gameStatusEnum.ASSASSIN);
+            game.setPlayerProposed(new ArrayList<>());
+            game.setProposal(new ArrayList<>());
+            game.setTask(0);
+            game.setFailsRemain(5);
+
         }
         else if (evil == 3) { // evil side wins
-            game.setStatus(gameStatusEnum.ASSASSIN);
+            game.setStatus(gameStatusEnum.FINISHED);
+            game.setGoodWins(false);
+            game.setPlayerProposed(new ArrayList<>());
+            game.setProposal(new ArrayList<>());
+            game.setTask(0);
+            game.setFailsRemain(5);
         } else {
             game.setStatus(gameStatusEnum.TEAM_PROPOSAL);
             game.setPlayerProposed(new ArrayList<>());
-            newLeader(game);
         }
         return game;
     }
@@ -349,7 +375,7 @@ public class gameService {
     public Game assassin(String name, String gameID) {
         Game game = gameRepo.getInstance().getGames().get(gameID);
         for (int i = 0; i < game.getPlayers().size(); i++) {
-            if (game.getPlayers().get(i).getName().equals(name)) {
+            if (game.getPlayers().get(i) != null && game.getPlayers().get(i).getName().equals(name)) {
                 if (game.getPlayers().get(i).getCharacter() == charactersEnum.MERLIN) {
                     game.setStatus(gameStatusEnum.FINISHED);
                     game.setGoodWins(false);
