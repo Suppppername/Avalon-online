@@ -1,4 +1,4 @@
-const url = window.location;
+const url = "hejianzhong.org";
 let stompClient;
 let gameID;
 let name;
