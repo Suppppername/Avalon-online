@@ -20,19 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @AllArgsConstructor
-@RequestMapping("/game")
+@RequestMapping("/Avalon/game")
 public class gameController {
 
     private final gameService service;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    @PostMapping("/Avalon/create")
+    @PostMapping("/create")
     public ResponseEntity<Game> create() {
         log.info("Create game request");
         return ResponseEntity.ok(service.createGame());
     }
 
-    @PostMapping("/Avalon/join/{gameID}")
+    @PostMapping("/join/{gameID}")
     public ResponseEntity<Game> join(@RequestBody Player player,
         @PathVariable(value = "gameID") String gameID) {
         log.info("Connect to game request : {}" + "/n gameID : " + gameID, player);
@@ -41,13 +41,13 @@ public class gameController {
         return ResponseEntity.ok(game);
     }
 
-    @GetMapping("/Avalon/{gameID}") // look up game state from the server
+    @GetMapping("/{gameID}") // look up game state from the server
     public ResponseEntity<Game> getGame(@PathVariable(value = "gameID") String gameID) {
         log.info("Get game request : {}", gameID);
         return ResponseEntity.ok(service.getGame(gameID));
     }
 
-    @PostMapping("/Avalon/{gameID}/start")
+    @PostMapping("/{gameID}/start")
     public ResponseEntity<Game> startGame(@RequestBody setting setting,
         @PathVariable(value = "gameID") String gameID) {
         log.info("Start game request : {}", gameID);
@@ -56,7 +56,7 @@ public class gameController {
         return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/Avalon/{gameID}/proposeTeam")
+    @PostMapping("/{gameID}/proposeTeam")
     public ResponseEntity<Game> proposeTeam(@RequestBody ArrayList<String> proposal,
         @PathVariable(value = "gameID") String gameID) {
         log.info("Propose team request : {}", proposal);
@@ -65,31 +65,31 @@ public class gameController {
         return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/Avalon/{gameID}/approveTeam")
+    @PostMapping("/{gameID}/approveTeam")
     public ResponseEntity<Game> approveTeam(@PathVariable(value = "gameID") String gameID) {
         Game game = service.approveTeam(gameID);
         return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/Avalon/{gameID}/rejectTeam")
+    @PostMapping("/{gameID}/rejectTeam")
     public ResponseEntity<Game> rejectTeam(@PathVariable(value = "gameID") String gameID) {
         Game game = service.rejectTeam(gameID);
         return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/Avalon/{gameID}/approveTask")
+    @PostMapping("/{gameID}/approveTask")
     public ResponseEntity<Game> approveTask(@PathVariable(value = "gameID") String gameID) {
         Game game = service.approveTask(gameID);
         return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/Avalon/{gameID}/rejectTask")
+    @PostMapping("/{gameID}/rejectTask")
     public ResponseEntity<Game> rejectTask(@PathVariable(value = "gameID") String gameID) {
         Game game = service.rejectTask(gameID);
         return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/Avalon/{gameID}/assassin")
+    @PostMapping("/{gameID}/assassin")
     public ResponseEntity<Game> assassin(@RequestBody String name, @PathVariable(value = "gameID") String gameID) {
         Game game = service.assassin(name, gameID);
         simpMessagingTemplate.convertAndSend("/topic/game/" + gameID, game);

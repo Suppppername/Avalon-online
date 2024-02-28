@@ -1,4 +1,3 @@
-const url = 'http://localhost:8080';
 let stompClient;
 let gameID;
 let name;
@@ -13,7 +12,7 @@ let isAssassin = false;
 
 function connectToSocket(gameID) {
   console.log("connecting to the game");
-  let socket = new SockJS(url + "/avalon");
+  let socket = new SockJS("/avalon");
   stompClient = Stomp.over(socket);
 
   stompClient.connect({}, function (frame) {
@@ -22,7 +21,7 @@ function connectToSocket(gameID) {
         function (response) {
           let data = JSON.parse(response.body);
           if (data.status === "NEW") {
-            console.log(data); // for debugging, not visible for users for fairness reasons
+            // for debugging, not visible for users for fairness reasons
             displayPlayers(data);
           } else if (data.status === "CHARACTER_NOTIFY") {
             gameSetup(data);
@@ -233,7 +232,7 @@ function leaderPropose(data) {
 function approve() {
   if (teamOrTask === 0) { // team
     $.ajax({
-      url: url + "/game/Avalon/" + gameID + "/approveTeam",
+      url: "game/" +gameID + "/approveTeam",
       type: 'POST',
       dataType: "json",
       contentType: "application/json",
@@ -241,17 +240,15 @@ function approve() {
         "approve": true
       }),
       success: function (data) {
-        console.log(data);
         document.getElementById('approve').style.display = "none";
         document.getElementById('reject').style.display = "none";
       },
       error: function (error) {
-        console.log(error);
       }
     });
   } else { // task
     $.ajax({
-      url: url + "/game/Avalon/" + gameID + "/approveTask",
+      url: "game/"  + gameID + "/approveTask",
       type: 'POST',
       dataType: "json",
       contentType: "application/json",
@@ -259,11 +256,9 @@ function approve() {
         "approve": true
       }),
       success: function (data) {
-        console.log(data);
         document.getElementById('approve').style.display = "none";
         document.getElementById('reject').style.display = "none";
       }, error: function (error) {
-        console.log(error);
       }
 
     })
@@ -273,7 +268,7 @@ function approve() {
 function reject() {
   if (teamOrTask === 0) { // team
     $.ajax({
-      url: url + "/game/Avalon/" + gameID + "/rejectTeam",
+      url: "game/" + gameID + "/rejectTeam",
       type: 'POST',
       dataType: "json",
       contentType: "application/json",
@@ -281,17 +276,15 @@ function reject() {
         "approve": false
       }),
       success: function (data) {
-        console.log(data);
         document.getElementById('approve').style.display = "none";
         document.getElementById('reject').style.display = "none";
       },
       error: function (error) {
-        console.log(error);
       }
     });
   } else { // task
     $.ajax({
-      url: url + "/game/Avalon/" + gameID + "/rejectTask",
+      url: "game/" + gameID + "/rejectTask",
       type: 'POST',
       dataType: "json",
       contentType: "application/json",
@@ -299,11 +292,9 @@ function reject() {
         "approve": false
       }),
       success: function (data) {
-        console.log(data);
         document.getElementById('approve').style.display = "none";
         document.getElementById('reject').style.display = "none";
       }, error: function (error) {
-        console.log(error);
       }
 
     })
@@ -332,8 +323,10 @@ function firstLeaderPropose(data) {
         + " by clicking names."
     document.getElementById('submitButtons').style.display = "block";
     document.getElementById('proposal').textContent = proposalTest;
+    document.getElementById('proposal').style.display = "block";
     const playerSpans = document.querySelectorAll('.seat span');
     const proposalArea = document.getElementById('playerProposed');
+    proposalArea.textContent = "";
     let selectedPlayers = [];
 
     function handlePlayerClick(event) {
@@ -354,6 +347,7 @@ function firstLeaderPropose(data) {
   } else {
     document.getElementById('playerProposed').style.display = "none";
     document.getElementById('submitButtons').style.display = "none";
+    document.getElementById('proposal').style.display = "block";
     document.getElementById('proposal').textContent = "Waiting for "
         + data.leader + " to propose a team";
   }
@@ -368,16 +362,14 @@ function submitProposal() {
       alert("Please select one player to assassinate");
     } else {
       $.ajax({
-        url: url + "/game/Avalon/" + gameID + "/assassin",
+        url: "game/"+gameID + "/assassin",
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
         data: document.getElementById('playerProposed').textContent,
         success: function (data) {
-          console.log(data);
         },
         error: function (error) {
-          console.log(error);
         }
       });
     }
@@ -387,18 +379,15 @@ function submitProposal() {
     let selectedPlayersArray = selectedPlayers ? selectedPlayers.split(', ')
         : [];
     $.ajax({
-      url: url + "/game/Avalon/" + gameID + "/proposeTeam",
+      url: "game/" + gameID + "/proposeTeam",
       type: 'POST',
       dataType: "json",
       contentType: "application/json",
       data: JSON.stringify(selectedPlayersArray),
       success: function (data) {
-        console.log(data);
         document.getElementById('submitButtons').style.display = "none";
-        document.getElementById('playerProposed').textContent = "";
       },
       error: function (error) {
-        console.log(error);
         alert("Incorrect number of players selected");
       }
     });
@@ -406,7 +395,6 @@ function submitProposal() {
 }
 
 function gameSetup(data) {
-  console.log(data);
   displayPlayersExceptNull(data);
   document.getElementById('pregameInfo').style.display = "none";
   document.getElementById('gameInfo').style.display = "block";
@@ -501,17 +489,16 @@ function gameSetup(data) {
 
 function createGame() {
   $.ajax({
-        url: url + "/game/Avalon/create",
+        url: "game/create",
         type: 'POST',
         dataType: "JSON",
         contentType: "application/json",
         success: function (data) {
           gameID = data.id;
           sessionStorage.setItem("firstTime", "1");
-          window.location.href = url + "/Avalon/" + data.id;
+          window.location.href = data.id;
         },
         error: function (error) {
-          console.log(error);
         },
 
       }
@@ -533,7 +520,7 @@ function enter() {
       name = window.prompt("Please enter a valid name");
     }
     $.ajax({
-      url: url + "/game/Avalon/join/" + gameID,
+      url: "game/join/" + gameID,
       type: 'POST',
       dataType: "json",
       contentType: "application/json",
@@ -541,37 +528,32 @@ function enter() {
         "name": name
       }),
       success: function (data) {
-        console.log(data);
         gameID = data.id;
         sessionStorage.setItem("firstTime", "0");
         sessionStorage.setItem("name", name);
         sessionStorage.setItem("gameID", gameID);
-        console.log(data);
         gameID = data.id;
         connectToSocket(gameID);
         displayPlayers(data);
       },
       error: function (error) {
-        console.log(error);
         alert("error joining the game, please close and try again");
       },
     });
   } else {
     $.ajax({
-      url: url + "/game/Avalon/" + gameID,
+      url: "game/" + gameID,
       type: 'GET',
       dataType: "json",
       contentType: "application/json",
       success: function (data) {
         name = sessionStorage.getItem("name");
         gameID = sessionStorage.getItem("gameID");
-        console.log(data);
         gameID = data.id;
         connectToSocket(gameID);
         displayPlayers(data);
       },
       error: function (error) {
-        console.log(error);
         alert("please refresh");
       },
     });
@@ -586,7 +568,7 @@ function joinGame() {
   }
   var roomID = prompt("Please enter room ID");
   $.ajax({
-    url: url + "/game/Avalon/join/" + roomID,
+    url: "game/join/" + roomID,
     type: 'POST',
     dataType: "json",
     contentType: "application/json",
@@ -594,7 +576,6 @@ function joinGame() {
       "name": name
     }),
     success: function (game) {
-      console.log(game);
       gameID = game.id;
       playerType = "";
       connectToSocket(gameID);
@@ -607,7 +588,6 @@ function joinGame() {
       displayPlayers(game);
     },
     error: function (error) {
-      console.log(error);
       alert("the roomID " + roomID + " does not exist or room is full");
     },
   })
@@ -618,7 +598,7 @@ function openSettings() {
   document.getElementById('settingsModal').style.display = "block";
 
   $.ajax({
-    url: url + "/game/Avalon/" + gameID,
+    url:"game/" + gameID,
     type: 'GET',
     dataType: "json",
     contentType: "application/json",
@@ -740,7 +720,7 @@ function displayPlayers(game) {
 
 function confirm() {
   $.ajax({
-    url: url + "/game/Avalon/" + gameID,
+    url:  "game/" + gameID,
     type: 'GET',
     dataType: "json",
     contentType: "application/json",
@@ -793,7 +773,6 @@ function confirm() {
       alert("Game is ready to start");
     },
     error: function (error) {
-      console.log(error);
       alert("Please close setting and try again.");
     }
   })
@@ -806,7 +785,7 @@ function startGame() {
     return;
   }
   $.ajax({
-    url: url + "/game/Avalon/" + gameID + "/start",
+    url: "game/" + gameID + "/start",
     type: 'POST',
     dataType: "json",
     contentType: "application/json",
@@ -818,11 +797,9 @@ function startGame() {
       "servant": document.getElementById('servant').value,
     }),
     success: function (data) {
-      console.log(data);
       displayPlayersExceptNull(data);
     },
     error: function (error) {
-      console.log(error);
       alert("Please try again.");
     }
   })
