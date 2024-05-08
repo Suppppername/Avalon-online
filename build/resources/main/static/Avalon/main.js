@@ -28,7 +28,7 @@ function connectToSocket(gameID) {
             firstLeaderPropose(data); // first leader propose
           } else if (data.status === "VOTE_TEAM") { // vote team
             teamOrTask = 0;
-            voteTeam(data)
+            voteTeam(data);
           } else if (data.status === "TEAM_PROPOSAL") { // fails
             leaderPropose(data);
           } else if (data.status === "VOTE_TASK") { // successes
