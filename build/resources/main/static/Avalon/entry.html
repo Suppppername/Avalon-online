@@ -6,291 +6,299 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avalon Online</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/jpg" href="Icon.JPG"/>
+    <link rel="icon" type="image/jpg" href="Icon.JPG" />
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src=main.js></script>
 </head>
+
 <body onload="enter()">
 
-<div id="settingsModal" class="modal-background">
-    <div class="rulesModal-content" style="height: 60%">
-        <span class="close-button" onclick="closeSettings()">&times;</span>
-        <h2>Settings</h2>
-        <h3>current players: <span id="currentPlayers"></span></h3>
-        <h3>hint: you need <span id="goodSide"></span> good side players and <span id="badSide"></span> bad side players</h3>
-        <h3>hint: Be careful with the settings as it may cause games to crash</h3>
-        <p align="left>">
-            Merlin(good): 1
-        </p>
-        <p>
-            Assassin(evil): 1
-        </p>
-        <p>
-            Local Servant of Arthur(good):<input id="servant" type="number" style="height: 5%;width: 5%"
-                                           value="1" min = "0">
-        </p>
-        <p>
-            Minions of Mordred(evil):<input id="minions" type="number" style="height: 5%;width: 5%"
-                                      value="1" min="0">
-        </p>
-      <p>
-        Percival(good): <input id="percival" type="number" style="height: 10%;width: 5%" value="0" max="1" min ="0">
-      </p>
-        <p>
-            Mordred(evil): <input id="mordred" type="number" style="height: 10%;width: 5%" value="0" max="1" min="0">
-        </p>
-        <p>
-            Morgana(evil): <input id="morgana" type="number" style="height: 10%;width: 5%" value="0" max = 1 min="0">
-        </p>
+    <div id="settingsModal" class="modal-background">
+        <div class="rulesModal-content" style="height: 60%">
+            <span class="close-button" onclick="closeSettings()">&times;</span>
+            <h2>Settings</h2>
+            <h3>current players: <span id="currentPlayers"></span></h3>
+            <h3>hint: you need <span id="goodSide"></span> good side players and <span id="badSide"></span> bad side
+                players</h3>
+            <h3>hint: Be careful with the settings as it may cause games to crash</h3>
+            <p align="left>">
+                Merlin(good): 1
+            </p>
+            <p>
+                Assassin(evil): 1
+            </p>
+            <p>
+                Local Servant of Arthur(good):<input id="servant" type="number" style="height: 5%;width: 5%" value="1"
+                    min="0">
+            </p>
+            <p>
+                Minions of Mordred(evil):<input id="minions" type="number" style="height: 5%;width: 5%" value="1"
+                    min="0">
+            </p>
+            <p>
+                Percival(good): <input id="percival" type="number" style="height: 10%;width: 5%" value="0" max="1"
+                    min="0">
+            </p>
+            <p>
+                Mordred(evil): <input id="mordred" type="number" style="height: 10%;width: 5%" value="0" max="1"
+                    min="0">
+            </p>
+            <p>
+                Morgana(evil): <input id="morgana" type="number" style="height: 10%;width: 5%" value="0" max=1 min="0">
+            </p>
 
-        <button onclick="confirm()">confirm</button>
+            <button onclick="confirm()">confirm</button>
 
-    </div>
-</div>
-
-<div id="charactersModal" class="modal-background">
-    <div class="rulesModal-content" style="height: 23%">
-        <span class="close-button" onclick="closeCharacters()">&times;</span>
-        <div style="display: flex">
-            <div class="green half">
-                <div style="font-weight: bold;font-size: 20px">Good</div>
-                <ul style="text-align: left; font-size: 20px">
-                    <li>Merlin: Knows evil, must remain hidden</li>
-                    <li>Percival: Knows Merlin</li>
-                    <li>Loyal servant of Arthur: Normie</li>
-
-                </ul>
-            </div>
-            <div class="red half">
-                <div style="font-weight: bold;font-size: 20px">Evil</div>
-                <ul style="text-align: left; font-size: 20px">
-                    <li>Mordred: Unknown to Merlin</li>
-                    <li>Morgana: Appears as Merlin</li>
-                    <li>Assassin: In case of lost, assassinate Merlin</li>
-                    <li>Oberon: Unknown to Evil</li>
-                    <li>Minions of Mordred: Normie</li>
-                </ul>
-            </div>
         </div>
     </div>
-</div>
-<div id="rulesModal" class="modal-background">
-    <div class="rulesModal-content">
-        <span class="close-button" onclick="closeRules()">&times;</span>
-        <h2>Rules</h2>
-        <h3 align="left">Objective</h3>
-        <p align="left">
 
-            The Resistance: Avalon is the game of hidden loyalty. Players are either Loyal Servants
-            of
-            Arther fighting for Goodness and honor or aligned with the Evil ways of Mordred.
+    <div id="charactersModal" class="modal-background">
+        <div class="rulesModal-content" style="height: 23%">
+            <span class="close-button" onclick="closeCharacters()">&times;</span>
+            <div style="display: flex">
+                <div class="green half">
+                    <div style="font-weight: bold;font-size: 20px">Good</div>
+                    <ul style="text-align: left; font-size: 20px">
+                        <li>Merlin: Knows evil, must remain hidden</li>
+                        <li>Percival: Knows Merlin</li>
+                        <li>Loyal servant of Arthur: Normie</li>
 
-            Good wins the game by successfully completing three Quests. Evil wins if three Quests
-            end in
-            failure. Evil can also win by assassinating Merlin at game's end or if a Quest cannot be
-            undertaken.
-
-            Players may make any claims during the game, at any point in the game. Discussion,
-            deception, accusation, and logical deduction are all equally important in order for Good
-            to
-            prevail or Evil to rule the day.
-        </p>
-        <h3 align='left'> Game play</h3>
-        <p align='left'> The game consists of several rounds; each round has a team building phase
-            and
-            a Quest phase.
-
-            In the team building phase the leader proposes a team to complete a Quest - all the
-            players
-            will either approve the proposed team and move to the quest phase, or reject the
-            proposed
-            team passing leadership to the next player and repeating the process until a team is
-            approved.
-
-            In the Quest phase those players selected to be on the team will determine if the Quest
-            is
-            successful.</p>
-        <h3 align='left'> Team building phase</h3>
-        <p align='left'>Team Assignment: After appropriate discussion, the leader takes the required
-            number of Team tokens and assigns each team token to any player. The leader can be on
-            the
-            team, but is not required to be so. Note a player may only be assigned one team
-            token.</p>
-        <h3 align="left">Team Vote</h3>
-        <p align='left'>After appropriate discussion, the leader calsl for a vote on the team
-            assignments. Each player, including the leader, secretly selects one vote card. When all
-            players have their selected vote card ready, the leader asks for the votes to be
-            revealed.
-            All vote tokens are flipped over so everyone can see how you voted.
-
-            The team is approved if the majority accepts. If the team is approved, play continues in
-            the
-            quest phase.
-
-            If the team is rejected (a tied vote is also rejection), the leader passes clockwise and
-            the
-            team building phase is repeated.
-
-            Evil wins the game if five teams are rejected in a single round.
-        </p>
-        <h3 align="left"> Quest phase</h3>
-        <p align="left">The leader passes a set of Quest cards to each team member. Each player on
-            the
-            quest selects a quest card and plays it face down in from of themselves.
-
-            The leader collects and shuffles the played quest cards before revealing. The quest is
-            completed successfully only if all the cards revealed are success cards. The quest fails
-            if
-            one fail cards have been played.
-        </p>
-        <p align="left">Note: The 4th quest (and only the 4th quest) in games of 7 or more players
-            require at least two Quest failed cards to be failed Quest. </p>
-        <h3 align="left">End of the Game</h3>
-        <p align="left">
-
-            Arthur and Goodness prevail if the team of Good is able to successfully complete three
-            quests
-            without revealing Merlin's true identity.
-
-            Mordred's dark forces of Evil win when three quests end in failure or are devious enough
-            to
-            force Merlin into the open.
-
-            The game ends immediately after either 3 succesful or three failed quests. The evil
-            players
-            win if 3 quests fail and when 5 teams are rejected in a single round.
-        </p>
-        <h3 align="left">Assassinate Merlin - Evil's Last Chance</h3>
-        <p align="left">If 3 quests are completed succesfully, the evil players will have a final
-            opportunity to win the game by correctly naming which of the good players is Merlin.
-
-            Without revealing any character cards, the evil players discuss and the player with the
-            assassin character card will name one good player as Merlin.
-
-            If the named player is Merlin, then Evil players win. If the evil players do not name
-            Merlin,
-            then the Good players win.</p>
-
-
-    </div>
-</div>
-<header>
-    <h1>AVALON - ONLINE</h1>
-    <nav>
-        <ul>
-            <li>
-                <button onclick="openCharacters()">Characters</button>
-            </li>
-            <li>
-                <button onclick="openRules()">Rules</button>
-            </li>
-            <li>
-                <button onclick="openSettings()">Settings</button>
-            </li>
-        </ul>
-    </nav>
-</header>
-
-<main id="roomPage">
-    <div class="flex-container">
-        <div class="flex-side">
-            <div class="seat">
-                <!--        <div class="ribbon"> 1</div>-->
-                <span id="player1" >player #1</span>
-            </div>
-            <div class="seat">
-                <!--        <div class="ribbon"> 2</div>-->
-                <span id="player2">player #2</span>
-            </div>
-            <div class="seat">
-                <!--        <div class="ribbon"> 3</div>-->
-                <span id="player3">player #3</span>
-            </div>
-            <div class="seat">
-                <!--        <div class="ribbon"> 4</div>-->
-                <span id="player4">player #4</span>
-            </div>
-            <div class="seat">
-                <!--        <div class="ribbon"> 5</div>-->
-                <span id="player5">player #5</span>
-            </div>
-        </div>
-        <div class="flex-center">
-            <div id="circle">
-                <div class="circle-info" id="pregameInfo">
-                    <p id="roomID">Room ID : 1 </p>
-                    <p>Click below to copy</p>
-                    <p style="color: #0000EE" id="link-to-copy" onclick="copyLink()"><u>hejianzhong.org/Avalon/room1</u>
-                    </p>
-                    <p style="color: #797777" id="hiddenParagraph"> Copied! </p>
-                    <button class="start-game-button" onclick="startGame()">Start Game</button>
+                    </ul>
                 </div>
-
-
-                <div class="circle-info" id = "gameInfo" style="display: none">
-                    <p> <span id = 'character'></span> </p>
-                    <p> <span id = 'proposal'></span> </p>
-                    <p> <span id = 'playerProposed'></span></p>
-                    <p> <span id = 'gameStatus'></span> </p>
-                    <div class="checkboxes">
-                        <span id="checkbox1" style="display: none">&#x2610;</span> <!-- &#x2713 is check; -->
-                        <span id="checkbox2" style="display: none">&#x2610;</span> <!-- &#x2717 is cross; -->
-                        <span id="checkbox3" style="display: none">&#x2610;</span> <!-- &#x2610 is empty box; -->
-                        <span id="checkbox4" style="display: none">&#x2610;</span>
-                        <span id="checkbox5" style="display: none">&#x2610;</span>
-                        <span id="checkbox6" style="display: none">&#x2610;</span>
-                        <span id="checkbox7" style="display: none">&#x2610;</span>
-                        <span id="checkbox8" style="display: none">&#x2610;</span>
-                        <span id="checkbox9" style="display: none">&#x2610;</span>
-                        <span id="checkbox10" style="display: none">&#x2610;</span>
-                    </div>
-                    <div class="dots">
-                        <span class="dot" id="dot1"></span>
-                        <span class="dot" id="dot2"></span>
-                        <span class="dot" id="dot3"></span>
-                        <span class="dot" id="dot4"></span>
-                        <span class="dot" id="dot5"></span>
-                    </div>
-                    <p> <span id = 'failsRemain'></span></p>
-                    <div class="buttons" id="voteButtons">
-                        <button onclick="approve()" style="color: #009933;background-color: #f0f0f0;display: none" id="approve">Approve</button>
-                        <button onclick="reject()" style="color: #ff6666;background-color: #f0f0f0;display: none" id ="reject">Reject</button>
-                    </div>
-                    <div class="buttons" id="submitButtons" style="display:none;">
-                        <button onclick="submitProposal()" style="background-color: #f0f0f0"> Submit</button>
-                    </div>
-
-                    <p style="display: none" id="voted">voted!</p>
+                <div class="red half">
+                    <div style="font-weight: bold;font-size: 20px">Evil</div>
+                    <ul style="text-align: left; font-size: 20px">
+                        <li>Mordred: Unknown to Merlin</li>
+                        <li>Morgana: Appears as Merlin</li>
+                        <li>Assassin: In case of lost, assassinate Merlin</li>
+                        <li>Oberon: Unknown to Evil</li>
+                        <li>Minions of Mordred: Normie</li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="flex-side">
-            <div class="seat">
-                <span id="player6">player #6</span>
-            </div>
-            <div class="seat">
-                <span id="player7">player #7</span>
-            </div>
-            <div class="seat">
-                <span id="player8">player #8</span>
-            </div>
-            <div class="seat">
-                <span id="player9">player #9</span>
-            </div>
-            <div class="seat">
-                <span id="player10">player #10</span>
-            </div>
+    </div>
+    <div id="rulesModal" class="modal-background">
+        <div class="rulesModal-content">
+            <span class="close-button" onclick="closeRules()">&times;</span>
+            <h2>Rules</h2>
+            <h3 align="left">Objective</h3>
+            <p align="left">
+
+                The Resistance: Avalon is the game of hidden loyalty. Players are either Loyal Servants
+                of
+                Arther fighting for Goodness and honor or aligned with the Evil ways of Mordred.
+
+                Good wins the game by successfully completing three Quests. Evil wins if three Quests
+                end in
+                failure. Evil can also win by assassinating Merlin at game's end or if a Quest cannot be
+                undertaken.
+
+                Players may make any claims during the game, at any point in the game. Discussion,
+                deception, accusation, and logical deduction are all equally important in order for Good
+                to
+                prevail or Evil to rule the day.
+            </p>
+            <h3 align='left'> Game play</h3>
+            <p align='left'> The game consists of several rounds; each round has a team building phase
+                and
+                a Quest phase.
+
+                In the team building phase the leader proposes a team to complete a Quest - all the
+                players
+                will either approve the proposed team and move to the quest phase, or reject the
+                proposed
+                team passing leadership to the next player and repeating the process until a team is
+                approved.
+
+                In the Quest phase those players selected to be on the team will determine if the Quest
+                is
+                successful.</p>
+            <h3 align='left'> Team building phase</h3>
+            <p align='left'>Team Assignment: After appropriate discussion, the leader takes the required
+                number of Team tokens and assigns each team token to any player. The leader can be on
+                the
+                team, but is not required to be so. Note a player may only be assigned one team
+                token.</p>
+            <h3 align="left">Team Vote</h3>
+            <p align='left'>After appropriate discussion, the leader calsl for a vote on the team
+                assignments. Each player, including the leader, secretly selects one vote card. When all
+                players have their selected vote card ready, the leader asks for the votes to be
+                revealed.
+                All vote tokens are flipped over so everyone can see how you voted.
+
+                The team is approved if the majority accepts. If the team is approved, play continues in
+                the
+                quest phase.
+
+                If the team is rejected (a tied vote is also rejection), the leader passes clockwise and
+                the
+                team building phase is repeated.
+
+                Evil wins the game if five teams are rejected in a single round.
+            </p>
+            <h3 align="left"> Quest phase</h3>
+            <p align="left">The leader passes a set of Quest cards to each team member. Each player on
+                the
+                quest selects a quest card and plays it face down in from of themselves.
+
+                The leader collects and shuffles the played quest cards before revealing. The quest is
+                completed successfully only if all the cards revealed are success cards. The quest fails
+                if
+                one fail cards have been played.
+            </p>
+            <p align="left">Note: The 4th quest (and only the 4th quest) in games of 7 or more players
+                require at least two Quest failed cards to be failed Quest. </p>
+            <h3 align="left">End of the Game</h3>
+            <p align="left">
+
+                Arthur and Goodness prevail if the team of Good is able to successfully complete three
+                quests
+                without revealing Merlin's true identity.
+
+                Mordred's dark forces of Evil win when three quests end in failure or are devious enough
+                to
+                force Merlin into the open.
+
+                The game ends immediately after either 3 succesful or three failed quests. The evil
+                players
+                win if 3 quests fail and when 5 teams are rejected in a single round.
+            </p>
+            <h3 align="left">Assassinate Merlin - Evil's Last Chance</h3>
+            <p align="left">If 3 quests are completed succesfully, the evil players will have a final
+                opportunity to win the game by correctly naming which of the good players is Merlin.
+
+                Without revealing any character cards, the evil players discuss and the player with the
+                assassin character card will name one good player as Merlin.
+
+                If the named player is Merlin, then Evil players win. If the evil players do not name
+                Merlin,
+                then the Good players win.</p>
+
 
         </div>
     </div>
+    <header>
+        <h1>AVALON - ONLINE</h1>
+        <nav>
+            <ul>
+                <li>
+                    <button onclick="openCharacters()">Characters</button>
+                </li>
+                <li>
+                    <button onclick="openRules()">Rules</button>
+                </li>
+                <li>
+                    <button onclick="openSettings()">Settings</button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="roomPage">
+        <div class="flex-container">
+            <div class="flex-side">
+                <div class="seat">
+                    <!--        <div class="ribbon"> 1</div>-->
+                    <span id="player1">player #1</span>
+                </div>
+                <div class="seat">
+                    <!--        <div class="ribbon"> 2</div>-->
+                    <span id="player2">player #2</span>
+                </div>
+                <div class="seat">
+                    <!--        <div class="ribbon"> 3</div>-->
+                    <span id="player3">player #3</span>
+                </div>
+                <div class="seat">
+                    <!--        <div class="ribbon"> 4</div>-->
+                    <span id="player4">player #4</span>
+                </div>
+                <div class="seat">
+                    <!--        <div class="ribbon"> 5</div>-->
+                    <span id="player5">player #5</span>
+                </div>
+            </div>
+            <div class="flex-center">
+                <div id="circle">
+                    <div class="circle-info" id="pregameInfo">
+                        <p id="roomID">Room ID : 1 </p>
+                        <p>Click below to copy</p>
+                        <p style="color: #0000EE" id="link-to-copy" onclick="copyLink()">
+                            <u>andy-he.com/Avalon/room1</u>
+                        </p>
+                        <p style="color: #797777" id="hiddenParagraph"> Copied! </p>
+                        <button class="start-game-button" onclick="startGame()">Start Game</button>
+                    </div>
 
 
-</main>
-<footer>
-    <p>Credit: Jianzhong He</p>
-    <p>Email: hejianzhong@berkeley.edu</p>
-</footer>
+                    <div class="circle-info" id="gameInfo" style="display: none">
+                        <p> <span id='character'></span> </p>
+                        <p> <span id='proposal'></span> </p>
+                        <p> <span id='playerProposed'></span></p>
+                        <p> <span id='gameStatus'></span> </p>
+                        <div class="checkboxes">
+                            <span id="checkbox1" style="display: none">&#x2610;</span> <!-- &#x2713 is check; -->
+                            <span id="checkbox2" style="display: none">&#x2610;</span> <!-- &#x2717 is cross; -->
+                            <span id="checkbox3" style="display: none">&#x2610;</span> <!-- &#x2610 is empty box; -->
+                            <span id="checkbox4" style="display: none">&#x2610;</span>
+                            <span id="checkbox5" style="display: none">&#x2610;</span>
+                            <span id="checkbox6" style="display: none">&#x2610;</span>
+                            <span id="checkbox7" style="display: none">&#x2610;</span>
+                            <span id="checkbox8" style="display: none">&#x2610;</span>
+                            <span id="checkbox9" style="display: none">&#x2610;</span>
+                            <span id="checkbox10" style="display: none">&#x2610;</span>
+                        </div>
+                        <div class="dots">
+                            <span class="dot" id="dot1"></span>
+                            <span class="dot" id="dot2"></span>
+                            <span class="dot" id="dot3"></span>
+                            <span class="dot" id="dot4"></span>
+                            <span class="dot" id="dot5"></span>
+                        </div>
+                        <p> <span id='failsRemain'></span></p>
+                        <div class="buttons" id="voteButtons">
+                            <button onclick="approve()" style="color: #009933;background-color: #f0f0f0;display: none"
+                                id="approve">Approve</button>
+                            <button onclick="reject()" style="color: #ff6666;background-color: #f0f0f0;display: none"
+                                id="reject">Reject</button>
+                        </div>
+                        <div class="buttons" id="submitButtons" style="display:none;">
+                            <button onclick="submitProposal()" style="background-color: #f0f0f0"> Submit</button>
+                        </div>
+
+                        <p style="display: none" id="voted">voted!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-side">
+                <div class="seat">
+                    <span id="player6">player #6</span>
+                </div>
+                <div class="seat">
+                    <span id="player7">player #7</span>
+                </div>
+                <div class="seat">
+                    <span id="player8">player #8</span>
+                </div>
+                <div class="seat">
+                    <span id="player9">player #9</span>
+                </div>
+                <div class="seat">
+                    <span id="player10">player #10</span>
+                </div>
+
+            </div>
+        </div>
+
+
+    </main>
+    <footer>
+        <p>Credit: Andy He</p>
+        <p>Email: hejianzhong@berkeley.edu</p>
+    </footer>
 </body>
+
 </html>
